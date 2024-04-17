@@ -1,7 +1,10 @@
 ## MLR In Bayes ##
 
-# Author: Bridget Bittmann
-# Date: 03/16/2023
+# By Carli Beisel
+# Adapted from Bridget Bittmann (2023, Github: bridgetmarie24)
+# Date originally created: 03/16/2023
+# Date adapted: 04/16/2024
+
 
 ## Import packages
 library(brms)

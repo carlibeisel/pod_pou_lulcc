@@ -1,5 +1,8 @@
-# Figures for thesis ##
+# Figures from model ##
 
+# By Carli Beisel
+# Adapted from Bridget Bittmann (2023, Github: bridgetmarie24)
+# Date adapted: 04/16/2024
 
 # Import packages with explanation #### 
 library(ggplot2) # plots
