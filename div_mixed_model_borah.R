@@ -1,8 +1,9 @@
 # Diversions mixed effects models for Borah #
 
-# Written by: Bridget Bittmann
-# Date created: 01/12/23
-# Date modified: 04/27/23
+# By Carli Beisel
+# Adapted from Bridget Bittmann (2023, Github: bridgetmarie24)
+# Date originally created:  01/12/23
+# Date adapted: 04/16/2024
 
 # Purpose: This runs GLMM with ARMA and without and outputs .RDS files of the models to be later 
 #           processed. 
