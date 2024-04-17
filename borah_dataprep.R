@@ -1,11 +1,12 @@
 # Final Model Selection #### 
 
-# This script uses a GLMM, a GLMM with ARMA, and MLR to understand the relationship
-# of canal flows with urban area and climate.
-
+# By Carli Beisel
 # Adapted from Bridget Bittmann (2023, Github: bridgetmarie24)
 # Date originally created: 02/01/23
 # Date adapted: 04/16/2024
+
+# This script uses a GLMM, a GLMM with ARMA, and MLR to understand the relationship
+# of canal flows with urban area and climate.
 
 # Import packages
 
