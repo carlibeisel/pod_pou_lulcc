@@ -3,8 +3,9 @@
 # This script uses a GLMM, a GLMM with ARMA, and MLR to understand the relationship
 # of canal flows with urban area and climate.
 
-# Author: Bridget Bittmann
-# Date created: 02/01/23
+# Adapted from Bridget Bittmann (2023, Github: bridgetmarie24)
+# Date originally created: 02/01/23
+# Date adapted: 04/16/2024
 
 # Import packages
 
@@ -21,13 +22,17 @@ library(flexmix)
 library(modelr)
 library(loo)
 library(here)
+install.packages('tseries')
 library(tseries)
+install.packages('urca')
 library(urca) #kpss test
+install.packages('plm')
 library(plm)
+install.packages('pracma')
 library(pracma)
 
 # Import the dataset to work with
-div <- read.csv('~/Desktop/diversion_models/Data.Inputs/input_full_013023.csv')
+div <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Data.Inputs/model_input.csv')
 div$lt <- log(div$Acre_feet)
 
 # ARMA MODEL ####
