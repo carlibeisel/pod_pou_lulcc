@@ -29,7 +29,7 @@ R
 2. div_mixed_model_borah.R : Runs GLMMs with priors and model specifications and outputs .RDS files borah_epreds.R : Uses model outputs to run expected predictions based on posterior outputs. This saves csv files for each of the variables that had a non-zero effect. These predictions are used to create marginal effects figures.
 3. ind_mlr_brms.R: Runs individual GLMs for each diversion and summarized effect sizes. Outputs a csv file with the effect size for each variable and the uncertainty around it.
 4. trend_plots.R: Runs Mann Kendall test and outputs plots for diversions with trends
-5. thesis_figures.R: This script creates all the figures in my thesis from model outputs besides the Mann Kendall analysis. Long script broken into sections based on the figures being made for each analysis
+5. figures.R: This script creates all the figures in my thesis from model outputs besides the Mann Kendall analysis. Long script broken into sections based on the figures being made for each analysis
 
 Contact Information
 
