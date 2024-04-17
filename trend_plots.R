@@ -1,10 +1,14 @@
 # Trend plots # 
+
+# By Carli Beisel
+# Adapted from Bridget Bittmann (2023, Github: bridgetmarie24)
+# Date originally created:  01/12/23
+# Date adapted: 04/16/2024
+
 # ------------------------------------------------------------------------------- #
 # This script uses Mann Kendall trend analysis to look at change through time for 
 # each diversion. Average +/- 95% CI change for each diversion is calculated.
 # ------------------------------------------------------------------------------- #
-# Author: Bridget Bittmann
-# Date created: 01/23/2023
 
 # Import packages
 library(dplyr) # data manipulation
