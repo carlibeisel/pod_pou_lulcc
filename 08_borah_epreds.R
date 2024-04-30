@@ -1,4 +1,4 @@
-# Get predicted draws for each variable from the ARMA model ## 
+# Purpose: Get predicted draws for each variable from the ARMA model ## 
 
 library(brms) # work with outputs of GLMMs
 library(bayesplot) # built in plots with brms
