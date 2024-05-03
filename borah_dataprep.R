@@ -20,6 +20,7 @@ library(readr)
 library(tibble)
 library(ggrepel)
 library(flexmix)
+install.packages('lattice')
 library(modelr)
 library(loo)
 library(here)
@@ -31,9 +32,10 @@ install.packages('plm')
 library(plm)
 install.packages('pracma')
 library(pracma)
+library(dplyr)
 
 # Import the dataset to work with
-div <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Data.Inputs/model_input.csv')
+div <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Data.Inputs/input_full_013023.csv')
 div$lt <- log(div$Acre_feet)
 
 # ARMA MODEL ####
@@ -58,7 +60,7 @@ for (i in names){
     print(i)
     print(length(sub$Acre_feet))
   }
-}
+} 
 
 remove <- c("Barber pumps", 
             "Mace-Mace Canal",
@@ -115,7 +117,7 @@ new <-pdata.frame(div_arma, index = c('Name', 'Year'))
 
 urb.test <- purtest(new_urb$class1_urban, data = new_urb, lags = 'AIC', test = 'levinlin') #non-stationary
 use.test <- purtest(new_use$AF_used, data = new_use, lags = 'AIC', test = 'levinlin') #non-stationary
-lt.test <- purtest(new$lt, data = new, lags = 'AIC', test = 'levinlin')
+lt.test <- purtest(new$lt, data = new, lags ='AIC', test = 'levinlin')
 AF.test <- purtest(new$Acre_feet, data = new, lags = 'AIC', test = 'levinlin')
 temp.test <- purtest(new$irrig_temp, data = new, lags = 'AIC', test = 'levinlin')
 prcp.test <- purtest(new$irrig_prcp, data = new, lags = 'AIC', test = 'levinlin') #non-stationary
@@ -189,13 +191,13 @@ for (i in vars){
 }
 
 # Export data for model in borah
-write.csv(arma_input, file = '~/Desktop/diversion_models/Data.Inputs/arma_input_041123.csv')
+write.csv(arma_input, file = '~/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Data.Inputs/arma_input_041123.csv')
 
 # MODEL WITH NO ARMA ####
 
 # Import appropriate data 
 
-div <- read.csv('~/Desktop/diversion_models/Data.Inputs/input_full_013023.csv')
+div <- read.csv('~/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Data.Inputs/input_full_013023.csv')
 div$lt <- log(div$Acre_feet)
 div <- subset(div, (Acre_feet > 0.00001)) # Remove data that has 0 
 
@@ -225,4 +227,4 @@ for (i in vars){
 
 
 # Export data for model in borah
-write.csv(div_new, file = '~/Desktop/diversion_models/Data.Inputs/glmm_input_041123.csv')
+write.csv(div_new, file = '~/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Data.Inputs/glmm_input_041123.csv')
