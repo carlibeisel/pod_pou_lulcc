@@ -11,25 +11,25 @@
 ## Section 1: Import packages and the data ##
 ## --------------------------------------- ##
 
-#install.packages('corrplot')
+install.packages('corrplot')
 library(corrplot)
-#install.packages('tidyverse')
-#remove.packages('tidyverse')
-#install.packages('tidyverse')
+install.packages('tidyverse')
+remove.packages('tidyverse')
+install.packages('tidyverse')
 library(dplyr)
 library(tidyverse)
 library(ggplot2)
-#install.packages('GGally')
+install.packages('GGally')
 library(GGally)
-#install.packages('ggfortify')
+install.packages('ggfortify')
 library(ggfortify)
-#remove.packages('dplyr')
-#install.packages('dplyr')
-#install.packages('Kendall')
+remove.packages('dplyr')
+install.packages('dplyr')
+install.packages('Kendall')
 library(Kendall)
 
 # Without zeros
-data <- data.frame(read.csv('~/Desktop/diversion_models/Data.Inputs/input_full_013023.csv'))
+data <- data.frame(read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Data.Inputs/input_full_050924.csv'))
 data <- data[-c(1,6,37,38)] # drops Python index output with csv
 data <- subset(data, select=-c(Month, DayofYear, Irrigation.Year, Sum, Diversion..cfs.))
 data['Mar_et'][is.na(data['Mar_et'])] <- 0 #fill NA et values with 0
@@ -38,14 +38,14 @@ nas <- data[rowSums(is.na(data)) > 0, ] #check for any data with remaining NA va
 data <- na.omit(data)
 
 # With zeros data
-data <- read.csv('~/Desktop/diversion_models/Data.Inputs/mixed_model_input_013023.csv')
+data <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Data.Inputs/mixed_model_input_050924.csv')
 data <- data[!duplicated(data[c('Name', 'Year')]),] #remove duplicates
 
 # OPTIONAL #
 # Checks for rows where the length of the irrigation season is greater than 350
-data <- subset(data, Range<350)
-data <- subset(data, StartDayofYear>35)
-data <- subset(data, EndDayofYear<350)
+#data <- subset(data, Range<350)
+#data <- subset(data, StartDayofYear>35)
+#data <- subset(data, EndDayofYear<350)
 
 ## --------------------------- ####
 ## Section 2: Standardize data ## 
@@ -93,14 +93,14 @@ for (i in col_name) {
 tt <- table(data$Name)
 data <- subset(data, Name %in% names(tt[tt>4]))
 # For data with zeros
-write.csv(data, '~/Desktop/diversion_models/Data.Inputs/input_full_013023.csv', row.names = FALSE)
+write.csv(data, '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Data.Inputs/input_full_050924.csv', row.names = FALSE)
 
 # Storage data 
 
 data$perc_used <- ifelse(data$AF_available > 0, data$AF_used/data$AF_available, NA)
 data$wr_storage <- ifelse(data$AF_available >0, 1, 0)
 
-write.csv(data, '~/Desktop/diversion_models/Data.Inputs/mixed_model_input.csv', row.names = FALSE)
+write.csv(data, '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Data.Inputs/mixed_model_input.csv', row.names = FALSE)
 
 ## -------------------------------------------------------------- ## 
 ## Section 3: Plot correlation matrix and check data distribution ## 
@@ -112,7 +112,7 @@ write.csv(data, '~/Desktop/diversion_models/Data.Inputs/mixed_model_input.csv', 
 ## End day of year
 ## Length of irrigation season (range)
 
-pdf(file='~/Desktop/diversion_models/Figures/acreft_hist_whole.pdf',
+pdf(file='/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/acreft_hist_whole.pdf',
     width=4,
     height=4)
 hist(data$Acre_feet, 

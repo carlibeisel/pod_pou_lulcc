@@ -191,18 +191,19 @@ for (i in vars){
 }
 
 # Export data for model in borah
-write.csv(arma_input, file = '~/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Data.Inputs/arma_input_041123.csv')
+write.csv(arma_input, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Data.Inputs/arma_input.csv')
 
 # MODEL WITH NO ARMA ####
 
 # Import appropriate data 
 
-div <- read.csv('~/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Data.Inputs/input_full_013023.csv')
+div <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Data.Inputs/input_full_013023.csv')
 div$lt <- log(div$Acre_feet)
 div <- subset(div, (Acre_feet > 0.00001)) # Remove data that has 0 
 
+str(div2)
 # Import file with Quinns Pond and Caldwell Lowline
-div2 <- read.csv('~/Desktop/diversion_models/Data.Inputs/mixed_model_input.csv')
+div2 <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Data.Inputs/mixed_model_input_013023.csv')
 div2$lt <- log(div2$Acre_feet)
 sel.name <- c("Quinns Pond", 'Caldwell Lowline Canal')
 div2 <- subset(div2, Name %in% sel.name)
