@@ -29,7 +29,7 @@ install.packages('Kendall')
 library(Kendall)
 
 # Without zeros
-data <- data.frame(read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Data.Inputs/input_full_050924.csv'))
+data <- data.frame(read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Data.Inputs/input_full_013023.csv'))
 data <- data[-c(1,6,37,38)] # drops Python index output with csv
 data <- subset(data, select=-c(Month, DayofYear, Irrigation.Year, Sum, Diversion..cfs.))
 data['Mar_et'][is.na(data['Mar_et'])] <- 0 #fill NA et values with 0
@@ -38,7 +38,7 @@ nas <- data[rowSums(is.na(data)) > 0, ] #check for any data with remaining NA va
 data <- na.omit(data)
 
 # With zeros data
-data <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Data.Inputs/mixed_model_input_050924.csv')
+data <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Data.Inputs/mixed_model_input_013023.csv')
 data <- data[!duplicated(data[c('Name', 'Year')]),] #remove duplicates
 
 # OPTIONAL #
@@ -93,14 +93,14 @@ for (i in col_name) {
 tt <- table(data$Name)
 data <- subset(data, Name %in% names(tt[tt>4]))
 # For data with zeros
-write.csv(data, '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Data.Inputs/input_full_050924.csv', row.names = FALSE)
+write.csv(data, '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Data.Inputs/input_full_013023.csv', row.names = FALSE)
 
 # Storage data 
 
 data$perc_used <- ifelse(data$AF_available > 0, data$AF_used/data$AF_available, NA)
 data$wr_storage <- ifelse(data$AF_available >0, 1, 0)
 
-write.csv(data, '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Data.Inputs/mixed_model_input.csv', row.names = FALSE)
+write.csv(data, '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Data.Inputs/mixed_model_input_013023.csv', row.names = FALSE)
 
 ## -------------------------------------------------------------- ## 
 ## Section 3: Plot correlation matrix and check data distribution ## 
@@ -127,7 +127,7 @@ lines(density(data$Acre_feet),
       lwd=2)
 dev.off()
 
-pdf(file='~/Desktop/diversion_models/Figures/acreft_hist_whole.pdf',
+pdf(file='/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/acreft_hist_whole.pdf',
     width=4,
     height=3)
 ggplot(data=data)+
@@ -141,7 +141,7 @@ dev.off()
 
 
 
-pdf(file='~/Desktop/diversion_models/Figures/start_hist.pdf',
+pdf(file='/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/start_hist.pdf',
     width=6,
     height=4)
 hist(data$StartDayofYear, 
@@ -156,7 +156,7 @@ lines(density(data$StartDayofYear),
       lwd=2)
 dev.off()
 
-pdf(file='~/Desktop/diversion_models/Figures/end_hist.pdf',
+pdf(file='/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/end_hist.pdf',
     width=6,
     height=4)
 hist(data$EndDayofYear, 
@@ -171,7 +171,7 @@ lines(density(data$EndDayofYear),
       lwd=2)
 dev.off()
 
-pdf(file='~/Desktop/diversion_models/Figures/length_hist.pdf',
+pdf(file='/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/length_hist.pdf',
     width=6,
     height=4)
 data$Time <- as.numeric(data$Time)
@@ -231,7 +231,7 @@ rownames(M) <- c('AF', 'Urban', 'Crops', ':P[ant]', ':P[ir]', ':T[ir]', ':T[JA]'
 colnames(M) <- c('ET',':Pr[non-irrig]', ':Pr[irrig]', ':T[irrig]', ':T[June-Aug]',':Q[in_LP]', 'MaxFill', ':p[urban]',':p[ag]','C','LPI')
 rownames(M) <- c('ET',':Pr[non-irrig]', ':Pr[irrig]', ':T[irrig]', ':T[June-Aug]',':Q[in_LP]', 'MaxFill', ':p[urban]',':p[ag]','C','LPI')
 
-pdf(file='~/Desktop/diversion_models/Figures/corr_matrix_discharge.pdf',
+pdf(file='/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/corr_matrix_discharge.pdf',
     width=8,
     height=8)
 corrplot(M, method='square', col= COL2('RdBu', 10), type='lower')
@@ -239,7 +239,7 @@ dev.off()
 
 #addCoef.col='black',
 
-pdf(file='~/Desktop/diversion_models/Figures/mixcorr_discharge.pdf',
+pdf(file='/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/mixcorr_discharge.pdf',
     width=8,
     height = 8)
 corrplot.mixed(M, lower='number', upper='shade', upper.col= COL2('RdBu', 10), lower.col='black')
@@ -249,7 +249,7 @@ land <- cor(data[, c(26:29)])
 colnames(land) <- c(':p[urban]',':p[ag]','C','LPI')
 rownames(land) <- c(':p[urban]',':p[ag]','C','LPI')
 
-pdf(file='~/Desktop/diversion_models/Figures/corr_matrix_land.pdf',
+pdf(file='/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/corr_matrix_land.pdf',
     width=8,
     height=8)
 corrplot(land, method='square', col= COL2('RdBu', 10), addCoef.col='white', type='lower')
@@ -259,7 +259,7 @@ climate <- cor(data[, c(17, 20:25)])
 colnames(climate) <- c('ET',':Pr[non-irrig]', ':Pr[irrig]', ':T[irrig]', ':T[June-Aug]', ':Q[in_LP]', 'MaxFill')
 rownames(climate) <- c('ET',':Pr[non-irrig]', ':Pr[irrig]', ':T[irrig]', ':T[June-Aug]', ':Q[in_LP]', 'MaxFill')
 
-pdf(file='~/Desktop/diversion_models/Figures/corr_matrix_climate.pdf',
+pdf(file='/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/corr_matrix_climate.pdf',
     width=8,
     height=8)
 corrplot(climate, method='square', col= COL2('RdBu', 10), addCoef.col='white', type='lower')
@@ -275,7 +275,7 @@ small <- data %>%
   group_by(Name) %>%
   filter(Acre_feet<10000)
 
-pdf(file='~/Desktop/diversion_models/Figures/urb_v_discharge_S.pdf',
+pdf(file='/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/urb_v_discharge_S.pdf',
     width=12,
     height = 6)
 ggplot(data=small) + 
@@ -293,7 +293,7 @@ large <- data %>%
   group_by(Name) %>%
   filter(Acre_feet>10000 & Name!= 'New York Canal')
 
-pdf(file='~/Desktop/diversion_models/Figures/urb_v_discharge_L.pdf',
+pdf(file='/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/urb_v_discharge_L.pdf',
     width=12,
     height = 8)
 ggplot(data=large) + 
@@ -309,7 +309,7 @@ dev.off()
 ny <- data %>%
   group_by(Name) %>%
   filter(Name== 'New York Canal')
-pdf(file='~/Desktop/diversion_models/Figures/NY_urb_v_discharge.pdf',
+pdf(file='/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/NY_urb_v_discharge.pdf',
     width=12,
     height = 8)
 ggplot(data=ny) + 
@@ -345,10 +345,10 @@ avgs <- data %>%
   summarize(avg = mean(Acre_feet), maxi = max(Acre_feet), mini= min(Acre_feet))
 
 high_urb_change <- data.frame(subset(change, change>10))
-write.csv(high_urb_change, '~/Desktop/diversion_models/Data.Inputs/high_change.csv', row.names = FALSE)
+write.csv(high_urb_change, '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Data.Inputs/high_change.csv', row.names = FALSE)
 
 low_change <- data.frame(subset(change, change<10))
-write.csv(low_change, '~/Desktop/diversion_models/Data.Inputs/low_change.csv', row.names = FALSE)
+write.csv(low_change, '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Data.Inputs/low_change.csv', row.names = FALSE)
 
 
 ## LOOK INTO ET DATA ## 
@@ -381,7 +381,7 @@ for (i in names) {
           labs(color=guide_legend(title='Precipitation (mm)')))
 }
 
-pdf(file='~/Desktop/diversion_models/Figures/JAtemp_v_year.pdf',
+pdf(file='/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/JAtemp_v_year.pdf',
     width=6,
     height = 5)
 ggplot(data=diversions)+
@@ -393,7 +393,7 @@ ggplot(data=diversions)+
   ylab('Average Maximum June-Aug Temp (C)')
 dev.off()
 
-pdf(file='~/Desktop/diversion_models/Figures/JAtemp_v_AF.pdf',
+pdf(file='/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/JAtemp_v_AF.pdf',
     width=5,
     height = 7)
 ggplot(data=diversions)+
