@@ -21,13 +21,13 @@ Python
 * 05_data_compilation.ipynb: This compiles climate, land use, and flow outputs and puts them in a usable, long-format csv file to import into R.
 
 R
-
-* 06_borah_dataprep.R: This takes full csv outputs from the Python output and puts it in the usable format for both the Generalized Linear Mixed Model with and without the ARMA. This exports 2 different csv files to be put into the respective models.
-* 07_div_mixed_model_borah.R : Runs GLMMs with priors and model specifications and outputs .RDS files borah_epreds.R : Uses model outputs to run expected predictions based on posterior outputs. This saves csv files for each of the variables that had a non-zero effect. These predictions are used to create marginal effects figures.
-* 08_borah_epreds.R : Get predicted draws for each variable from the ARMA model
-* 09_ind_mlr_brms.R: Runs individual GLMs for each diversion and summarized effect sizes. Outputs a csv file with the effect size for each variable and the uncertainty around it.
-* 10_trend_plots.R: Runs Mann Kendall test and outputs plots for diversions with trends
-* 11_figures.R: This script creates all the figures in my thesis from model outputs besides the Mann Kendall analysis. Long script broken into sections based on the figures being made for each analysis
+* 06_preprocessing.R:This script standardizes compiled data for use in the GLMM and GLMM+ARMA models, plots correlation matrix, and checks data distribution. 
+* 07_borah_dataprep.R: This takes full csv outputs from the Python output and puts it in the usable format for both the Generalized Linear Mixed Model with and without the ARMA. This exports 2 different csv files to be put into the respective models.
+* 08_div_mixed_model_borah.R : Runs GLMMs with priors and model specifications and outputs .RDS files borah_epreds.R : Uses model outputs to run expected predictions based on posterior outputs. This saves csv files for each of the variables that had a non-zero effect. These predictions are used to create marginal effects figures.
+* 09_borah_epreds.R : Get predicted draws for each variable from the ARMA model
+* 10_ind_mlr_brms.R: Runs individual GLMs for each diversion and summarized effect sizes. Outputs a csv file with the effect size for each variable and the uncertainty around it.
+* 11_trend_plots.R: Runs Mann Kendall test and outputs plots for diversions with trends
+* 12_figures.R: This script creates all the figures in my thesis from model outputs besides the Mann Kendall analysis. Long script broken into sections based on the figures being made for each analysis
 
 Contact Information
 
