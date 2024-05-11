@@ -7,6 +7,9 @@
 # Date originally created: 06/09/2022
 # Date adapted: 04/16/2024
 
+# Purpose: This script standardizes compiled data for use in the GLMM and 
+# GLMM+ARMA models, plots correlation matrix, and checks data distribution. 
+
 ## --------------------------------------- ## 
 ## Section 1: Import packages and the data ##
 ## --------------------------------------- ##

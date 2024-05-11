@@ -13,10 +13,11 @@
 library(Matrix)
 library(tidyverse)
 library(dplyr)
+install.packages('leaps')
 library(leaps) #regsubsets
 library(mvtnorm) #multivariate distributions
+install.packages('caret')
 library(caret) # for train command
-
 
 # Import the data
 div <- read.csv('~/Desktop/diversion_models/Data.Inputs/input_full_013023.csv')

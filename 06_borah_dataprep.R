@@ -35,7 +35,7 @@ library(pracma)
 library(dplyr)
 
 # Import the dataset to work with
-div <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Data.Inputs/input_full_013023.csv')
+div <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Data.Inputs/input_full_051024.csv')
 div$lt <- log(div$Acre_feet)
 
 # ARMA MODEL ####
@@ -197,13 +197,13 @@ write.csv(arma_input, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/
 
 # Import appropriate data 
 
-div <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Data.Inputs/input_full_013023.csv')
+div <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Data.Inputs/input_full_051024.csv')
 div$lt <- log(div$Acre_feet)
 div <- subset(div, (Acre_feet > 0.00001)) # Remove data that has 0 
 
 str(div2)
 # Import file with Quinns Pond and Caldwell Lowline
-div2 <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Data.Inputs/mixed_model_input_013023.csv')
+div2 <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Data.Inputs/mixed_model_input_051024.csv')
 div2$lt <- log(div2$Acre_feet)
 sel.name <- c("Quinns Pond", 'Caldwell Lowline Canal')
 div2 <- subset(div2, Name %in% sel.name)
@@ -228,4 +228,4 @@ for (i in vars){
 
 
 # Export data for model in borah
-write.csv(div_new, file = '~/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Data.Inputs/glmm_input_041123.csv')
+write.csv(div_new, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Data.Inputs/glmm_input.csv')
