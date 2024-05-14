@@ -27,7 +27,8 @@ R
 * 08_borah_epreds.R : Get predicted draws for each variable from the ARMA model
 * 09_ind_mlr_brms.R: Runs individual GLMs for each diversion and summarized effect sizes. Outputs a csv file with the effect size for each variable and the uncertainty around it.
 * 10_trend_plots.R: Runs Mann Kendall test and outputs plots for diversions with trends
-* 11_figures.R: This script creates all the figures in my thesis from model outputs besides the Mann Kendall analysis. Long script broken into sections based on the figures being made for each analysis
+* 11_MLR_individual: The purpose of this script was to run an individual multiple linear regression for each of the 63 diversions. Function and script based on Kendra Kaiser Wood River Collaborative Analysis.
+* 12_figures.R: This script creates all the figures in my thesis from model outputs besides the Mann Kendall analysis. Long script broken into sections based on the figures being made for each analysis
 
 Contact Information
 
