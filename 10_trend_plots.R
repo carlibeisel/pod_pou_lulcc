@@ -19,7 +19,7 @@ library(ggplot2) # plotting
 library(ggpubr) # arrange a grid of plots
 
 # Read in the data  ####
-div <- read.csv('~/Desktop/diversion_models/Data.Inputs/input_full_013023.csv')
+div <- read.csv('~/Desktop/diversion_models/Data.Inputs/input_full.csv')
 div_full <- subset(div, (Acre_feet > 0.00001))
 
 sub <- div_full %>%
