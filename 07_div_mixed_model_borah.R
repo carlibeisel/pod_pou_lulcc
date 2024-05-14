@@ -5,12 +5,10 @@
 # Date originally created:  01/12/23
 # Date adapted: 04/16/2024
 
-# Purpose: This runs GLMM with ARMA and without and outputs .RDS files of the models to be later 
-#           processed. 
+# Purpose: This runs GLMM with ARMA and without and outputs .RDS files of the 
+# models to be later processed. 
 
 # Import packages
-
-# DELETE SOME OF THESE 
 
 library(brms) # Do bayesian models, use function brm
 library(tidyverse) # 
@@ -21,17 +19,12 @@ library(ggrepel)
 library(flexmix)
 library(modelr)
 
-# Data imports ####
-# DO THIS
-# df.arma
-# df.glmm 
-
 # ARMA Model ####
 
 ###### Import the data #
 
 print('Import diversion data for ARMA model')
-diversions <- read.csv('~/scratch/diversion-mods/data/arma_input_041123.csv')
+diversions <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Data.Inputs/arma_input.csv')
 diversions <- diversions[!duplicated(diversions[c('Name', 'Year')]),] #remove duplicates
 diversions <- na.omit(diversions)
 
@@ -59,12 +52,12 @@ AF.arma.stud <- brms::brm(lt ~ (1 + scale_d.urb | Name) + scale_d.urb + scale_d.
                                          adapt_delta = 0.999),
                           cores = getOption('mc.cores', parallel::detectCores()))
 summary(AF.arma.stud)
-saveRDS(AF.arma.stud, file = '~/scratch/diversion-mods/model_output/mod-arma-stud-041123.RDS')
+saveRDS(AF.arma.stud, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_outputs/mod-arma-stud.RDS')
 
 # Model with no arma ####
 
 # Read in the data for model with no ARMA 
-diversions <- read.csv('~/scratch/diversion-mods/data/glmm_input_041123.csv')
+diversions <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Data.Inputs/glmm_input.csv')
 print(c('This is the length before removing duplicates', length(diversions$Acre_feet)))
 diversions <- diversions[!duplicated(diversions[c('Name', 'Year')]),] #remove duplicates
 print(length(diversions$Acre_feet))
@@ -91,4 +84,4 @@ AF.mix <- brm(Acre_feet ~ (1 + scale_class1_urban | Name) + scale_class1_urban +
               cores = getOption('mc.cores', parallel::detectCores()))
 
 summary(AF.mix)
-saveRDS(AF.mix, file = '~/scratch/diversion-mods/model_output/mod-mix-041123.RDS')
+saveRDS(AF.mix, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_outputs/mod-mix.RDS')
