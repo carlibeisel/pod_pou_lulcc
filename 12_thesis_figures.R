@@ -10,7 +10,9 @@ library(ggpubr) # arrange multi-plot figure
 library(dplyr) # dataframe manipulation
 library(Matrix)
 library(tidyverse) # dataframe manipulation (summaries)
+install.packages('superheat')
 library(superheat) #for heat map with na values
+install.packages('gplots')
 library(gplots)
 library(reshape2)
 library(gridExtra)
@@ -20,14 +22,13 @@ library(brms) # work with outputs of GLMMs
 library(bayesplot) # built in plots with brms
 library(tidybayes) # get clean draws from brms object
 library(modelr) # model manipulation for visualization
+install.packages('svglite')
 library(svglite) # to save ggplots as svg files to edit in inkscape
+install.packages('wesanderson')
 library(wesanderson) # color palette
+install.packages('ggpattern')
 library(ggpattern)
-
-# Set directories for data and models ####
-
-cd_data <- '~/Desktop/diversion_models/Data.Inputs/'
-cd_models <- '~/Desktop/diversion_models/final_models/'
+library(dplyr)
 
 # Functions ####
 
@@ -58,8 +59,8 @@ mae <- function(model, data_compare){
 
 # MLR figures frequentist ####
 
-mlr <- read.csv('~/Desktop/diversion_models/final_models/MLR_final.csv')
-div <- read.csv('~/Desktop/diversion_models/Data.Inputs/input_full_013023.csv')
+mlr <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_outputs/MLR_final.csv')
+div <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Data.Inputs/input_full.csv')
 div_full <- subset(div, (Acre_feet > 0.00001))
 div_full <- subset(div_full, Name %in% unique(mlr$names))
 df = div_full %>%
@@ -86,13 +87,15 @@ df.melt <- melt(heat.data, id.vars = 'r2')
 df.melt$adjr2 <- as.character(df.melt$r2)
 cols <- c('#00798c', 'white', '#edae49')
 
-df.melt$x <- factor(df.melt$X,
+#changed X to 'variable' because X doesn't exist as a column name in df.melt
+df.melt$x <- factor(df.melt$variable,
                     levels = c('1', '2', '3', '4', '5', '6', '7', '8', '9', '10',
                                '11', '12', '13', '14', '15', '16', '17', '18', '19', '20',
                                '21', '22', '23', '24', '25', '26', '27', '28', '29', '30',
                                '31', '32', '33', '34', '35', '36', '37', '38', '39', '40',
                                '41', '42', '43', '44', '45', '46', '47', '48', '49', '50',
                                '51', '52', '53', '54', '55', '56', '57', '58', '59', '60'))
+
 
 hm <- ggplot(data = df.melt, aes(x = variable, y = adjr2, fill = factor(value))) + 
   geom_tile() + 
@@ -102,7 +105,7 @@ hm <- ggplot(data = df.melt, aes(x = variable, y = adjr2, fill = factor(value)))
   xlab('Variable') +
   ylab('R^2 of Individual Models')
 hm
-ggsave('~/Desktop/Thesis Writing/Figures/heatmap.png', plot = hm,
+ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/heatmap.png', plot = hm,
        width = 6, height = 7)
 rows.df <- data.frame(rowSums(mlr[,c('urb','prcp', 'temp','et','stor')]))
 l <- c('urb','prcp', 'temp','et','stor')
@@ -118,8 +121,8 @@ uin <- subset(urbsub, stor.coef > 0)
 udown <- subset(urbsub, stor.coef < 0)
 df$val_up[5] <- length(uin$X)
 df$val_down[5] <- length(udown$X)
-write.csv(df, file = '~/Desktop/sig.csv')
-df <- read.csv('~/Desktop/sig.csv')
+write.csv(df, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/sig.csv')
+df <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/sig.csv')
 df <- df[,c('val_up', 'val_down', 'variable')]
 colnames(df)[colnames(df) == "variable"] ="name"
 
@@ -183,14 +186,14 @@ bp.x
 
 grid <- ggarrange(bp.y, hm, nrow = 2, ncol = 1, heights = c(30, 60), widths =  15)
 grid
-ggsave(file = '~/Desktop/Thesis Writing/Figures/mlr.svg', plot = grid,
+ggsave(file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/mlr.svg', plot = grid,
        width = 5, height = 11)
 
 # Figures for MLR Bayesian ####
 
 # Read in the dataframes
-sum.df <- read.csv('~/Desktop/diversion_models/Model_outputs/mlr_brm_sum_final_033123.csv') # coefficients for variables
-fit.df <- read.csv('~/Desktop/diversion_models/Model_outputs/mlr_brm_fit_final_033123.csv') # model fit
+sum.df <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_outputs/mlr_brm_sum_final.csv') # coefficients for variables
+fit.df <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_outputs/mlr_brm_fit_final.csv') # model fit
 
 # Clean/Manipulate data 
 
@@ -222,8 +225,8 @@ sum.df$r2.char <- as.character(signif(sum.df$r2, digits = 3)) #Converts to chara
 
 # Make the heatmap 
 cc <- scales::seq_gradient_pal("#00798C", "white", "Lab")(seq(0,1,length.out=4))
-neg <- "#00798C" "#6FA4B1" "#B8D1D7" "#FFFFFF"
-pos <- "#EDAE49" "#F6C278" "#FCD6A4" "#FFEAD1" "#FFFFFF"
+neg <- c("#00798C", "#6FA4B1", "#B8D1D7", "#FFFFFF")
+pos <- c("#EDAE49", "#F6C278", "#FCD6A4", "#FFEAD1", "#FFFFFF")
 
 hmap <- ggplot(data = sum.df, aes(x = vars, y = r2.char, fill = range_class, pattern = sig,)) +
   geom_tile() +
@@ -244,7 +247,7 @@ hmap <- ggplot(data = sum.df, aes(x = vars, y = r2.char, fill = range_class, pat
   # scale_pattern_angle_manual(values = c(sig = 45, sig_oob = 45, no = 0, oob = 125)) +
   scale_pattern_manual(values = c( yes = "stripe", no = 'none')) 
 hmap
-ggsave('~/Desktop/Thesis Writing/Figures/mlr_bayes_hm.svg', plot = hmap,
+ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/mlr_bayes_hm.svg', plot = hmap,
        height = 7,
        width = 5)
 
@@ -252,7 +255,8 @@ ggsave('~/Desktop/Thesis Writing/Figures/mlr_bayes_hm.svg', plot = hmap,
 urb.p <- subset(sum.df, vars == 'scale_class1_urban' & Estimate > 0.1)
 urb.n <- subset(sum.df, vars == 'scale_class1_urban' & Estimate < -0.1)
 urb.sig <- subset(sum.df, vars == 'scale_class1_urban' & sig == 'yes' & Estimate > 0)
-precip <- subset(sum.df, vars == 'irrig_prcp')
+precip <- subset(sum.df, vars == 'prcp.m') #weird variable name for precip. in one of bridgets versions it was irrig_precip
+
 max(precip$Estimate)
 min(precip$Estimate)
 
@@ -273,13 +277,14 @@ box <- ggplot(data = sum.df, aes(x = vars, y = Estimate)) +
   geom_boxplot()
 
 box
-why
 
 # Figures for Model with no ARMA ####
 
+#here 
+
 #Import data and model 
-df.mix <- read.csv(paste(cd_data, 'glmm_input_041123.csv', sep = ''))
-mod.mix <- readRDS(paste(cd_models, 'mod-mix-041123.RDS', sep = ''))
+df.mix <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Data.Inputs/glmm_input.csv')
+mod.mix <- readRDS('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_outputs/mod-mix.RDS')
 
 # Posterior predictive check 
 
@@ -290,7 +295,7 @@ pp <- pp_check(mod.mix, ndraws = 20) +
   coord_cartesian(xlim = c(0,900000)) +
   theme(text = element_text(size=13, family = 'Arial'))
 
-ggsave('~/Desktop/diversion_models/ManuscriptFigures/ppcheck-GLMM-042623.tiff',
+ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/ppcheck-GLMM.tiff',
        plot = pp,
        width = 5,
        height = 4)
@@ -319,7 +324,7 @@ mcmc_plot(mod.mix,
                                'Storage Water Use' = '#edae49'))+
   xlab('Relative Effect Size (log)') +
   theme(text = element_text(size=18, family = 'Arial'))
-ggsave('~/Desktop/diversion_models/ManuscriptFigures/postmass_all_mix_041123.svg', 
+ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/postmass_all_mix.svg', 
        width = 7,
        height = 6,
        units = 'in')
@@ -351,7 +356,7 @@ urban <- ggplot(data=epreddraws,
   theme(text = element_text(size = 13)) +
   scale_y_continuous(labels = scales::comma) +
   coord_cartesian(ylim = c(400, 2000))
-ggsave('~/Desktop/diversion_models/ManuscriptFigures/mix-urb-041223.tiff', 
+ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/mix-urb.tiff', 
        plot = urban,
        width = 4,
        height = 4,
@@ -397,7 +402,7 @@ stor <- ggplot(data=epreddraws,
   theme(text = element_text(size = 13)) +
   scale_y_continuous(labels = scales::comma)
 stor
-ggsave('~/Desktop/diversion_models/ManuscriptFigures/mix-stor-041223.tiff', 
+ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/mix-stor.tiff', 
        plot = stor,
        width = 4,
        height = 4,
@@ -435,7 +440,7 @@ prcp <- ggplot(data=epreddraws,
   scale_y_continuous(labels = scales::comma) +
   coord_cartesian(ylim = c(400, 2000))
 prcp
-ggsave('~/Desktop/diversion_models/ManuscriptFigures/mix-prcp-041223.tiff',
+ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/mix-prcp.tiff',
        plot = prcp,
        width = 4,
        height = 4,
@@ -456,12 +461,12 @@ change_prcp <- epreddraws %>%
 
 
 comb <- ggarrange(urban, prcp, stor, ncol = 3, labels = c('A', 'B', 'C'))
-ggsave(comb, file = '~/Desktop/diversion_models/ManuscriptFigures/marg-GLMM-all-042623.tiff',
+ggsave(comb, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/marg-GLMM-all.tiff',
        width = 12,
        height = 4.5)
 # Figures for Model with  ARMA ####
-df.arma <- read.csv(paste(cd_data, 'arma_input_041123.csv', sep=''))
-mod.arma <- readRDS(paste(cd_models, 'mod-arma-stud-041123.RDS', sep = ''))
+df.arma <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Data.Inputs/arma_input.csv')
+mod.arma <- readRDS('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_outputs/mod-arma-stud.RDS')
 bayes_R2(mod.arma)
 mae_lt(mod.arma, df.arma$Acre_feet)
 
@@ -474,7 +479,7 @@ pp <- pp_check(mod.arma, ndraws = 20) +
   coord_cartesian(xlim = c(0,15)) +
   theme(text = element_text(size=13, family = 'Arial'))
 
-ggsave('~/Desktop/diversion_models/ManuscriptFigures/ppcheck-ARMA-042623.tiff',
+ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/ppcheck-ARMA.tiff',
        plot = pp,
        width = 5,
        height = 4)
@@ -499,7 +504,7 @@ mcmc_plot(mod.arma,
                               'Storage Water Use')) +
   xlab('Relative Effect Size (log)') +
   theme(text = element_text(size=18, family = 'Arial'))
-ggsave('~/Desktop/diversion_models/ManuscriptFigures/post-arma-041223.svg', 
+ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/post-arma.svg', 
        width = 8,
        height = 6,
        units = 'in')
@@ -507,7 +512,7 @@ ggsave('~/Desktop/diversion_models/ManuscriptFigures/post-arma-041223.svg',
 
 # Precip plot 
 
-prcp_epred <- read.csv(paste(cd_data, 'epred_prcp_041223.csv', sep = ''))
+prcp_epred <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_outputs/epred_prcp.csv')
 
 prcp <- ggplot(data=prcp_epred,
                aes(x = unscale.prcp, y = exp(.epred))) +
@@ -519,7 +524,7 @@ prcp <- ggplot(data=prcp_epred,
   theme(text = element_text(size = 13)) +
   scale_y_continuous(labels = scales::comma)
 prcp
-ggsave('~/Desktop/diversion_models/ManuscriptFigures/arma-prcp-041223.tiff', 
+ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/arma-prcp.tiff', 
        plot = prcp,
        width = 4,
        height = 4,
@@ -540,7 +545,7 @@ change_prcp <- prcp_epred %>%
 mean(change_prcp$differ_pred, na.rm = T)
 
 # ET plot 
-et_epred <- read.csv(paste(cd_data, 'epred_et_041223.csv', sep = ''))
+et_epred <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_outputs/epred_et.csv')
 et <- ggplot(data=et_epred,
              aes(x = unscale.et*1000, y = exp(.epred))) +
   stat_lineribbon(
@@ -550,7 +555,7 @@ et <- ggplot(data=et_epred,
   theme_bw() +
   theme(text = element_text(size = 13)) +
   scale_y_continuous(labels = scales::comma)
-ggsave('~/Desktop/diversion_models/ManuscriptFigures/arma-et-041223.tiff', 
+ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/arma-et.tiff', 
        plot = et,
        width = 4,
        height = 4,
@@ -570,7 +575,7 @@ change_et <- et_epred %>%
 mean(change_et$differ_pred, na.rm = T)
 
 # Temp plot 
-temp_epred <- read.csv(paste(cd_data, 'epred_temp_041223.csv', sep = ''))
+temp_epred <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_outputs/epred_temp.csv')
 temp <- ggplot(data=temp_epred,
                aes(x = unscale.temp, y = exp(.epred))) +
   stat_lineribbon(
@@ -581,7 +586,7 @@ temp <- ggplot(data=temp_epred,
   theme(text = element_text(size = 13)) +
   scale_y_continuous(labels = scales::comma)
 temp
-ggsave('~/Desktop/diversion_models/ManuscriptFigures/arma-temp-041223.tiff', 
+ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/arma-temp.tiff', 
        plot = temp,
        width = 4,
        height = 4,
@@ -600,7 +605,7 @@ change_temp <- temp_epred %>%
 mean(change_temp$differ_pred, na.rm = T)
 
 # Storage plot
-stor_epred <- read.csv(paste(cd_data, 'epred_use_041223.csv', sep = ''))
+stor_epred <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_outputs/epred_use.csv')
 stor_epred$KAF <- stor_epred$unscale.use/1000
 stor <- ggplot(data=stor_epred,
                aes(x = KAF, y = exp(.epred))) +
@@ -612,7 +617,7 @@ stor <- ggplot(data=stor_epred,
   theme(text = element_text(size = 13)) +
   scale_y_continuous(labels = scales::comma)
 stor
-ggsave('~/Desktop/diversion_models/ManuscriptFigures/arma-stor-041223.tiff', plot = stor,
+ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/arma-stor.tiff', plot = stor,
        width = 4,
        height = 4,
        units = 'in')
@@ -628,6 +633,6 @@ change_stor <- stor_epred %>%
 mean(change_stor$differ_pred, na.rm = T)
 
 final <- ggarrange(temp, et, prcp, stor, nrow = 2, ncol = 2, labels = c('A', 'B', 'C', 'D'))
-ggsave(final, file = '~/Desktop/diversion_models/ManuscriptFigures/grid-arma-042623.tiff',
+ggsave(final, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/grid-arma.tiff',
        width = 9,
        height = 9)
