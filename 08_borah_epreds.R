@@ -1,3 +1,7 @@
+# By Carli Beisel
+# Adapted from Bridget Bittmann (2023, Github: bridgetmarie24)
+# Date adapted: 04/24/2024
+
 # Purpose: Get predicted draws for each variable from the ARMA model ## 
 
 library(brms) # work with outputs of GLMMs
@@ -7,11 +11,9 @@ library(modelr) # model manipulation for visualization
 library(dplyr) # dataframe manipulation
 library(tidyverse)
 
-cd <- '~/scratch/predict/'
-
 # Load the data and the model 
-df.arma <- read.csv(paste(cd, 'data/arma_input_041123.csv', sep = ''))
-mod.arma <- readRDS('~/scratch/predict/data/mod-arma-stud-041123.RDS')
+df.arma <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Data.Inputs/arma_input.csv')
+mod.arma <- readRDS('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_outputs/mod-arma-stud.RDS')
 
 # Unscale function
 unscale <- function(x, orig){
@@ -38,7 +40,7 @@ epreddraws <- add_epred_draws(mod.arma,
                               re_formula=NA)
 epreddraws$unscale.prcp <- unscale(epreddraws$scale_d.prcp, df.arma$d.prcp)
 print('success drawing predictions')
-out_file <- paste(cd, 'model_output/epred_prcp_041223.csv', sep = '')
+out_file <- paste('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_outputs/epred_prcp.csv')
 write.csv(epreddraws, file = out_file)
 
 print('Epreds for temp')
@@ -58,7 +60,7 @@ epreddraws <-  add_epred_draws(mod.arma,
                                re_formula=NA)
 epreddraws$unscale.temp <- unscale(epreddraws$scale_d.temp, df.arma$d.temp)
 print('success drawing predictions')
-out_file <- paste(cd, 'model_output/epred_temp_041223.csv', sep = '')
+out_file <- paste('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_outputs/epred_temp.csv')
 write.csv(epreddraws, file = out_file)
 
 print('Epred draws for AF used')
@@ -77,7 +79,7 @@ epreddraws <-  add_epred_draws(mod.arma,
                                re_formula=NA)
 epreddraws$unscale.use <- unscale(epreddraws$scale_d.use, df.arma$d.use)
 print('success drawing predictions')
-out_file <- paste(cd, 'model_output/epred_use_041223.csv', sep = '')
+out_file <- paste('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_outputs/epred_use.csv')
 write.csv(epreddraws, file = out_file)
 
 print('epred draws for ET')
@@ -96,5 +98,5 @@ epreddraws <-  add_epred_draws(mod.arma,
                                re_formula=NA)
 epreddraws$unscale.et <- unscale(epreddraws$scale_d.et, df.arma$d.et)
 print('success drawing predictions')
-out_file <- paste(cd, 'model_output/epred_et_041223.csv', sep = '')
+out_file <- paste('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_outputs/epred_et.csv')
 write.csv(epreddraws, file = out_file)
