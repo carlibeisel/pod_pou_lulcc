@@ -24,7 +24,7 @@ library(modelr)
 ###### Import the data #
 
 print('Import diversion data for ARMA model')
-diversions <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Data.Inputs/arma_input.csv')
+diversions <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/data_input/arma_input.csv')
 diversions <- diversions[!duplicated(diversions[c('Name', 'Year')]),] #remove duplicates
 diversions <- na.omit(diversions)
 
@@ -52,12 +52,12 @@ AF.arma.stud <- brms::brm(lt ~ (1 + scale_d.urb | Name) + scale_d.urb + scale_d.
                                          adapt_delta = 0.999),
                           cores = getOption('mc.cores', parallel::detectCores()))
 summary(AF.arma.stud)
-saveRDS(AF.arma.stud, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_outputs/mod-arma-stud.RDS')
+saveRDS(AF.arma.stud, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/mod-arma-stud.RDS')
 
 # Model with no arma ####
 
 # Read in the data for model with no ARMA 
-diversions <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Data.Inputs/glmm_input.csv')
+diversions <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/data_input/glmm_input.csv')
 print(c('This is the length before removing duplicates', length(diversions$Acre_feet)))
 diversions <- diversions[!duplicated(diversions[c('Name', 'Year')]),] #remove duplicates
 print(length(diversions$Acre_feet))
@@ -84,4 +84,4 @@ AF.mix <- brm(Acre_feet ~ (1 + scale_class1_urban | Name) + scale_class1_urban +
               cores = getOption('mc.cores', parallel::detectCores()))
 
 summary(AF.mix)
-saveRDS(AF.mix, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_outputs/mod-mix.RDS')
+saveRDS(AF.mix, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/mod-mix.RDS')
