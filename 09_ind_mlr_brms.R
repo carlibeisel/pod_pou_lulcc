@@ -5,7 +5,6 @@
 # Date originally created: 03/16/2023
 # Date adapted: 04/16/2024
 
-
 ## Import packages
 library(brms)
 library(Matrix)
@@ -13,7 +12,7 @@ library(tidyverse)
 library(dplyr)
 
 ## Import data
-div <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Data.Inputs/input_full.csv')
+div <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/data_input/input_full.csv')
 div <- div[!duplicated(div[c('Name', 'Year')]),] #remove duplicates
 div <- subset(div, (Acre_feet > 0.00001)) # Remove data that has 0 
 div_new <- subset(div, !(Name == 'Ester Simplot')) #Removes short dataframe
@@ -113,12 +112,12 @@ sum.df <- sum.df %>% as.data.frame(row.names = 1:nrow(.)) #fix the index
 fit.df <- bind_rows(mod_fits) # merge all model fits together
 
 # Save raw model summaries and model fits
-write.csv(sum.df, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_outputs/mlr_brm_sum_raw.csv')
-write.csv(fit.df, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_outputs/mlr_brm_fit_raw.csv')
+write.csv(sum.df, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/mlr_brm_sum_raw.csv')
+write.csv(fit.df, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/mlr_brm_fit_raw.csv')
 
 # # Read in files if R crashes on model reruns
-sum.df <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_outputs/mlr_brm_sum_raw.csv')
-fit.df <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_outputs/mlr_brm_fit_raw.csv')
+sum.df <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/mlr_brm_sum_raw.csv')
+fit.df <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/mlr_brm_fit_raw.csv')
 
 # Extract problematic runs based on Rhat
 probs <- sum.df %>%
@@ -264,8 +263,8 @@ fit.df.prob <- bind_rows(fits_probs) # merge all model fits together
 fit.df.prob <- fit.df.prob %>% as.data.frame(row.names = 1:nrow(.)) #fix the index
 
 # Save dataframes from reruns 
-write.csv(sum.df.prob, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_outputs/mlr_brm_sum_prob.csv')
-write.csv(fit.df.prob, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_outputs/mlr_brm_fit_prob.csv')
+write.csv(sum.df.prob, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/mlr_brm_sum_prob.csv')
+write.csv(fit.df.prob, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/mlr_brm_fit_prob.csv')
 
 
 # Extract problematic runs based on Rhat
@@ -297,8 +296,8 @@ fit.df.final <- subset(fit.df, !(name %in% prob_names))
 fit.df.final <- bind_rows(fit.df.final, fit.df.prob)
 
 # Save final model summaries and model fits
-write.csv(sum.df.final, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_outputs/mlr_brm_sum_final.csv')
-write.csv(fit.df.final, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_outputs/mlr_brm_fit_final.csv')
+write.csv(sum.df.final, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/mlr_brm_sum_final.csv')
+write.csv(fit.df.final, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/mlr_brm_fit_final.csv')
 
 ## Rerun brms models with no standardizing of variables ####
 
@@ -417,6 +416,6 @@ temp <- subset(sum.df, vars == 'irrig_temp')
 et <- subset(sum.df, vars == 'et')
 
 # Export dataframes
-write.csv(sum.df, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_outputs/mlr_brm_sum_final.csv')
-write.csv(fit.df, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_outputs/mlr_brm_fit_final.csv')
+write.csv(sum.df, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/mlr_brm_sum_final.csv')
+write.csv(fit.df, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/mlr_brm_fit_final.csv')
 
