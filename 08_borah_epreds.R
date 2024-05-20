@@ -12,8 +12,8 @@ library(dplyr) # dataframe manipulation
 library(tidyverse)
 
 # Load the data and the model 
-df.arma <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Data.Inputs/arma_input.csv')
-mod.arma <- readRDS('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_outputs/mod-arma-stud.RDS')
+df.arma <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/data_input/arma_input.csv')
+mod.arma <- readRDS('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/mod-arma-stud.RDS')
 
 # Unscale function
 unscale <- function(x, orig){
@@ -40,7 +40,7 @@ epreddraws <- add_epred_draws(mod.arma,
                               re_formula=NA)
 epreddraws$unscale.prcp <- unscale(epreddraws$scale_d.prcp, df.arma$d.prcp)
 print('success drawing predictions')
-out_file <- paste('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_outputs/epred_prcp.csv')
+out_file <- paste('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/epred_prcp.csv')
 write.csv(epreddraws, file = out_file)
 
 print('Epreds for temp')
@@ -60,7 +60,7 @@ epreddraws <-  add_epred_draws(mod.arma,
                                re_formula=NA)
 epreddraws$unscale.temp <- unscale(epreddraws$scale_d.temp, df.arma$d.temp)
 print('success drawing predictions')
-out_file <- paste('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_outputs/epred_temp.csv')
+out_file <- paste('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/epred_temp.csv')
 write.csv(epreddraws, file = out_file)
 
 print('Epred draws for AF used')
@@ -79,7 +79,7 @@ epreddraws <-  add_epred_draws(mod.arma,
                                re_formula=NA)
 epreddraws$unscale.use <- unscale(epreddraws$scale_d.use, df.arma$d.use)
 print('success drawing predictions')
-out_file <- paste('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_outputs/epred_use.csv')
+out_file <- paste('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/epred_use.csv')
 write.csv(epreddraws, file = out_file)
 
 print('epred draws for ET')
@@ -98,5 +98,5 @@ epreddraws <-  add_epred_draws(mod.arma,
                                re_formula=NA)
 epreddraws$unscale.et <- unscale(epreddraws$scale_d.et, df.arma$d.et)
 print('success drawing predictions')
-out_file <- paste('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_outputs/epred_et.csv')
+out_file <- paste('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/epred_et.csv')
 write.csv(epreddraws, file = out_file)
