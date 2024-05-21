@@ -4,11 +4,11 @@ Modified from Bridget Bittmann (2023; github: bridgetmarie24)
 
 Analyze the Impacts of Urbanization and Climate on Diversions in the Lower Boise River Basin
 
-**Summary**
+# **Summary**
 
 This analysis analyzes the impacts of urbanization and climate on diverisons in the Lower Boise River Basin from 1987 to 2020. This also analyzes trend through time in flow volumes. This analysis was done because the Lower Boise River Basin is rapidly urbanizing its agricultural lands, and water managers did not possess the long term analysis to understand how the urbanization was impacting the distribution of irrigation water resources.
 
-**Steps to running diversion analysis:**
+# **Steps to running diversion analysis:**
 
 Python scripts are basically all the data preprocessing for what goes into the models, and the R scripts are all the modeling.
 
@@ -16,7 +16,7 @@ Python scripts are basically all the data preprocessing for what goes into the m
 
 * 01_diversion_timeseries.ipynb : This script takes daily irrigation season flow values for the diversions and calculates 1) total water diverted, 2) start day of irrigation season, 3) end day of irrigation season, 4) length of irrigation season. It corrects for diversions that would go beyond the bounds of a true irrigation season (e.g., February).
 * 02_extract_gridment.ipynb: This script calculates zonal stats for each POU from Daymet and SSEBop data.
-* 03_subset_LULCC.ipynb: This script uses LCMAP data to calculate annual percent of each land class from 1987 to 2020 for each POU.
+* 03_subset_LULCC.ipynb: This script uses LCMAP data to calculate annual percent of each land class from 1987 to 2020 for each POU.(Requires pylandstats version 2.1.3)
 * 04_ hydromet_data.ipynb: This script calculates the reservoir carryover and the maximum fill for the 3 reservoirs (Anderson Ranch, Arrowrock, Lucky Peak) in the Lower Boise River Basin.
 * 05_data_compilation.ipynb: This compiles climate, land use, and flow outputs and puts them in a usable, long-format csv file to import into R.
 
@@ -30,6 +30,6 @@ Python scripts are basically all the data preprocessing for what goes into the m
 * 11_MLR_individual: The purpose of this script was to run an individual multiple linear regression for each of the 63 diversions. Function and script based on Kendra Kaiser Wood River Collaborative Analysis.
 * 12_figures.R: This script creates all the figures in my thesis from model outputs besides the Mann Kendall analysis. Long script broken into sections based on the figures being made for each analysis
 
-**Contact Information**
+# **Contact Information**
 
 For more information or questions regarding this analysis, please email Bridget Bittmann at bridgetbittmann@u.boisestate.edu.
