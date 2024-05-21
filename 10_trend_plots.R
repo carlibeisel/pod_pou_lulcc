@@ -17,6 +17,8 @@ library(tidyverse) # data manipulation
 library(Kendall) # Mann Kendall test
 library(ggplot2) # plotting
 library(ggpubr) # arrange a grid of plots
+install.packages('plyr')
+library(plyr)
 
 # Read in the data  ####
 div <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/input_full.csv')
