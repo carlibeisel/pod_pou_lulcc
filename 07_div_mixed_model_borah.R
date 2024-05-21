@@ -24,7 +24,7 @@ library(modelr)
 ###### Import the data #
 
 print('Import diversion data for ARMA model')
-diversions <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/data_input/arma_input.csv')
+diversions <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/arma_input.csv')
 diversions <- diversions[!duplicated(diversions[c('Name', 'Year')]),] #remove duplicates
 diversions <- na.omit(diversions)
 
@@ -57,7 +57,7 @@ saveRDS(AF.arma.stud, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/
 # Model with no arma ####
 
 # Read in the data for model with no ARMA 
-diversions <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/data_input/glmm_input.csv')
+diversions <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/glmm_input.csv')
 print(c('This is the length before removing duplicates', length(diversions$Acre_feet)))
 diversions <- diversions[!duplicated(diversions[c('Name', 'Year')]),] #remove duplicates
 print(length(diversions$Acre_feet))
