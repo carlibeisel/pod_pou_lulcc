@@ -12,7 +12,7 @@ library(tidyverse)
 library(dplyr)
 
 ## Import data
-div <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/data_input/input_full.csv')
+div <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/input_full.csv')
 div <- div[!duplicated(div[c('Name', 'Year')]),] #remove duplicates
 div <- subset(div, (Acre_feet > 0.00001)) # Remove data that has 0 
 div_new <- subset(div, !(Name == 'Ester Simplot')) #Removes short dataframe
