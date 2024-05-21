@@ -19,7 +19,7 @@ library(ggplot2) # plotting
 library(ggpubr) # arrange a grid of plots
 
 # Read in the data  ####
-div <- read.csv('~/Desktop/diversion_models/Data.Inputs/input_full.csv')
+div <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/input_full.csv')
 div_full <- subset(div, (Acre_feet > 0.00001))
 
 sub <- div_full %>%
@@ -109,7 +109,7 @@ new = div_trend %>%
   ungroup()
 change$urb_change <- new$`last(class1_urban) - first(class1_urban)`
 urb <- subset(change, (pc<0) & (urb_change > 10))
-write.csv(change, file = '~/Desktop/diversion_models/final_models/trend.csv')
+write.csv(change, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/trend.csv')
 
 up <- subset(change, pc > 0)
 up_n <- unique(up$name)
@@ -138,7 +138,7 @@ plt_up2 <- change_mult(u, 'Increasing Trends')
 plt_down2 <- change_mult(d, 'Decreasing Trends')
 grid <- ggpubr::ggarrange(plt_up1, plt_down1, plt_up2, plt_down2, ncol = 2, nrow = 2, labels = c('A', 'B', 'C', 'D'))
 grid
-ggsave('~/Desktop/Thesis Writing/Figures/mk_fig_full.jpg', 
+ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/figures/mk_fig_full.jpg', 
        width = 8,
        height = 8,
        units = 'in')
@@ -284,7 +284,7 @@ trends_all <- ggarrange(p_time, p_start, p_end, n_time, n_start, n_end,
                         ncol = 3,
                         nrow = 2)
 
-ggsave('~/Desktop/Thesis Writing/Figures/time_trend.svg',
+ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/figures/time_trend.svg',
        plot = trends_all,
        width = 8,
        height = 6)
