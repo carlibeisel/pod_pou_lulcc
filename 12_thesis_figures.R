@@ -59,8 +59,8 @@ mae <- function(model, data_compare){
 
 # MLR figures frequentist ####
 
-mlr <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_outputs/MLR_final.csv')
-div <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Data.Inputs/input_full.csv')
+mlr <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/MLR_final.csv')
+div <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/input_full.csv')
 div_full <- subset(div, (Acre_feet > 0.00001))
 div_full <- subset(div_full, Name %in% unique(mlr$names))
 df = div_full %>%
@@ -105,7 +105,7 @@ hm <- ggplot(data = df.melt, aes(x = variable, y = adjr2, fill = factor(value)))
   xlab('Variable') +
   ylab('R^2 of Individual Models')
 hm
-ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/heatmap.png', plot = hm,
+ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/figures/heatmap.png', plot = hm,
        width = 6, height = 7)
 rows.df <- data.frame(rowSums(mlr[,c('urb','prcp', 'temp','et','stor')]))
 l <- c('urb','prcp', 'temp','et','stor')
@@ -121,8 +121,8 @@ uin <- subset(urbsub, stor.coef > 0)
 udown <- subset(urbsub, stor.coef < 0)
 df$val_up[5] <- length(uin$X)
 df$val_down[5] <- length(udown$X)
-write.csv(df, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/sig.csv')
-df <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/sig.csv')
+write.csv(df, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/sig.csv')
+df <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/sig.csv')
 df <- df[,c('val_up', 'val_down', 'variable')]
 colnames(df)[colnames(df) == "variable"] ="name"
 
@@ -186,14 +186,14 @@ bp.x
 
 grid <- ggarrange(bp.y, hm, nrow = 2, ncol = 1, heights = c(30, 60), widths =  15)
 grid
-ggsave(file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/mlr.svg', plot = grid,
+ggsave(file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/figures/mlr.svg', plot = grid,
        width = 5, height = 11)
 
 # Figures for MLR Bayesian ####
 
 # Read in the dataframes
-sum.df <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_outputs/mlr_brm_sum_final.csv') # coefficients for variables
-fit.df <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_outputs/mlr_brm_fit_final.csv') # model fit
+sum.df <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/mlr_brm_sum_final.csv') # coefficients for variables
+fit.df <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/mlr_brm_fit_final.csv') # model fit
 
 # Clean/Manipulate data 
 
@@ -247,7 +247,7 @@ hmap <- ggplot(data = sum.df, aes(x = vars, y = r2.char, fill = range_class, pat
   # scale_pattern_angle_manual(values = c(sig = 45, sig_oob = 45, no = 0, oob = 125)) +
   scale_pattern_manual(values = c( yes = "stripe", no = 'none')) 
 hmap
-ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/mlr_bayes_hm.svg', plot = hmap,
+ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_ouput/figures/mlr_bayes_hm.svg', plot = hmap,
        height = 7,
        width = 5)
 
@@ -283,8 +283,8 @@ box
 #here 
 
 #Import data and model 
-df.mix <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Data.Inputs/glmm_input.csv')
-mod.mix <- readRDS('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_outputs/mod-mix.RDS')
+df.mix <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/glmm_input.csv')
+mod.mix <- readRDS('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/mod-mix.RDS')
 
 # Posterior predictive check 
 
@@ -295,7 +295,7 @@ pp <- pp_check(mod.mix, ndraws = 20) +
   coord_cartesian(xlim = c(0,900000)) +
   theme(text = element_text(size=13, family = 'Arial'))
 
-ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/ppcheck-GLMM.tiff',
+ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/figures/ppcheck-GLMM.tiff',
        plot = pp,
        width = 5,
        height = 4)
@@ -324,7 +324,7 @@ mcmc_plot(mod.mix,
                                'Storage Water Use' = '#edae49'))+
   xlab('Relative Effect Size (log)') +
   theme(text = element_text(size=18, family = 'Arial'))
-ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/postmass_all_mix.svg', 
+ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/figures/postmass_all_mix.svg', 
        width = 7,
        height = 6,
        units = 'in')
@@ -356,7 +356,7 @@ urban <- ggplot(data=epreddraws,
   theme(text = element_text(size = 13)) +
   scale_y_continuous(labels = scales::comma) +
   coord_cartesian(ylim = c(400, 2000))
-ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/mix-urb.tiff', 
+ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/figures/mix-urb.tiff', 
        plot = urban,
        width = 4,
        height = 4,
@@ -402,7 +402,7 @@ stor <- ggplot(data=epreddraws,
   theme(text = element_text(size = 13)) +
   scale_y_continuous(labels = scales::comma)
 stor
-ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/mix-stor.tiff', 
+ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/figures/mix-stor.tiff', 
        plot = stor,
        width = 4,
        height = 4,
@@ -440,7 +440,7 @@ prcp <- ggplot(data=epreddraws,
   scale_y_continuous(labels = scales::comma) +
   coord_cartesian(ylim = c(400, 2000))
 prcp
-ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/mix-prcp.tiff',
+ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/figures/mix-prcp.tiff',
        plot = prcp,
        width = 4,
        height = 4,
@@ -465,7 +465,7 @@ ggsave(comb, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/m
        width = 12,
        height = 4.5)
 # Figures for Model with  ARMA ####
-df.arma <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Data.Inputs/arma_input.csv')
+df.arma <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/arma_input.csv')
 mod.arma <- readRDS('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_outputs/mod-arma-stud.RDS')
 bayes_R2(mod.arma)
 mae_lt(mod.arma, df.arma$Acre_feet)
@@ -479,7 +479,7 @@ pp <- pp_check(mod.arma, ndraws = 20) +
   coord_cartesian(xlim = c(0,15)) +
   theme(text = element_text(size=13, family = 'Arial'))
 
-ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/ppcheck-ARMA.tiff',
+ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/figures/ppcheck-ARMA.tiff',
        plot = pp,
        width = 5,
        height = 4)
@@ -504,7 +504,7 @@ mcmc_plot(mod.arma,
                               'Storage Water Use')) +
   xlab('Relative Effect Size (log)') +
   theme(text = element_text(size=18, family = 'Arial'))
-ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/post-arma.svg', 
+ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/figures/post-arma.svg', 
        width = 8,
        height = 6,
        units = 'in')
@@ -512,7 +512,7 @@ ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/post-arma.svg'
 
 # Precip plot 
 
-prcp_epred <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_outputs/epred_prcp.csv')
+prcp_epred <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/epred_prcp.csv')
 
 prcp <- ggplot(data=prcp_epred,
                aes(x = unscale.prcp, y = exp(.epred))) +
@@ -524,7 +524,7 @@ prcp <- ggplot(data=prcp_epred,
   theme(text = element_text(size = 13)) +
   scale_y_continuous(labels = scales::comma)
 prcp
-ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/arma-prcp.tiff', 
+ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/figures/arma-prcp.tiff', 
        plot = prcp,
        width = 4,
        height = 4,
@@ -545,7 +545,7 @@ change_prcp <- prcp_epred %>%
 mean(change_prcp$differ_pred, na.rm = T)
 
 # ET plot 
-et_epred <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_outputs/epred_et.csv')
+et_epred <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/epred_et.csv')
 et <- ggplot(data=et_epred,
              aes(x = unscale.et*1000, y = exp(.epred))) +
   stat_lineribbon(
@@ -555,7 +555,7 @@ et <- ggplot(data=et_epred,
   theme_bw() +
   theme(text = element_text(size = 13)) +
   scale_y_continuous(labels = scales::comma)
-ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/arma-et.tiff', 
+ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/figures/arma-et.tiff', 
        plot = et,
        width = 4,
        height = 4,
@@ -575,7 +575,7 @@ change_et <- et_epred %>%
 mean(change_et$differ_pred, na.rm = T)
 
 # Temp plot 
-temp_epred <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_outputs/epred_temp.csv')
+temp_epred <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/epred_temp.csv')
 temp <- ggplot(data=temp_epred,
                aes(x = unscale.temp, y = exp(.epred))) +
   stat_lineribbon(
@@ -586,7 +586,7 @@ temp <- ggplot(data=temp_epred,
   theme(text = element_text(size = 13)) +
   scale_y_continuous(labels = scales::comma)
 temp
-ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/arma-temp.tiff', 
+ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/figures/arma-temp.tiff', 
        plot = temp,
        width = 4,
        height = 4,
@@ -605,7 +605,7 @@ change_temp <- temp_epred %>%
 mean(change_temp$differ_pred, na.rm = T)
 
 # Storage plot
-stor_epred <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_outputs/epred_use.csv')
+stor_epred <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/epred_use.csv')
 stor_epred$KAF <- stor_epred$unscale.use/1000
 stor <- ggplot(data=stor_epred,
                aes(x = KAF, y = exp(.epred))) +
@@ -617,7 +617,7 @@ stor <- ggplot(data=stor_epred,
   theme(text = element_text(size = 13)) +
   scale_y_continuous(labels = scales::comma)
 stor
-ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/arma-stor.tiff', plot = stor,
+ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/figures/arma-stor.tiff', plot = stor,
        width = 4,
        height = 4,
        units = 'in')
@@ -633,6 +633,6 @@ change_stor <- stor_epred %>%
 mean(change_stor$differ_pred, na.rm = T)
 
 final <- ggarrange(temp, et, prcp, stor, nrow = 2, ncol = 2, labels = c('A', 'B', 'C', 'D'))
-ggsave(final, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/grid-arma.tiff',
+ggsave(final, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/figures/grid-arma.tiff',
        width = 9,
        height = 9)

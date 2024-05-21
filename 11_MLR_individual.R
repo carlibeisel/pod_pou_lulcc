@@ -20,7 +20,7 @@ install.packages('caret')
 library(caret) # for train command
 
 # Import the data
-div <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Data.Inputs/input_full.csv')
+div <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/input_full.csv')
 div <- div[!duplicated(div[c('Name', 'Year')]),] #remove duplicates
 div <- subset(div, (Acre_feet > 0.00001)) # Remove data that has 0 
 div_new <- subset(div, !(Name == 'Ester Simplot')) #Removes short dataframe
@@ -205,4 +205,4 @@ for (i in 1:60) {
 }
 df$vars <- rowSums(df[,c('et', 'temp','prcp','urb','stor')])
 
-write.csv(df, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_outputs/MLR_final.csv')
+write.csv(df, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/MLR_final.csv')
