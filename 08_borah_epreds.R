@@ -12,7 +12,7 @@ library(dplyr) # dataframe manipulation
 library(tidyverse)
 
 # Load the data and the model 
-df.arma <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/arma_input.csv')
+df.arma <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/arma_input_0531.csv')
 mod.arma <- readRDS('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/mod-arma-stud.RDS')
 
 # Unscale function

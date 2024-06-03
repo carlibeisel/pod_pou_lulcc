@@ -20,23 +20,78 @@ library(readr)
 library(tibble)
 library(ggrepel)
 library(flexmix)
-install.packages('lattice')
+#install.packages('lattice')
 library(modelr)
 library(loo)
 library(here)
-install.packages('tseries')
+#install.packages('tseries')
 library(tseries)
-install.packages('urca')
+#install.packages('urca')
 library(urca) #kpss test
-install.packages('plm')
+#install.packages('plm')
 library(plm)
-install.packages('pracma')
+#install.packages('pracma')
 library(pracma)
 library(dplyr)
 
-# Import the dataset to work with
-div <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/input_full.csv')
-div$lt <- log(div$Acre_feet)
+#PREPROSSESING
+# ------------------------------------------------------------------------------- #
+# This part of the script standardizes variables and creates a new, scaled column  
+# in the original .csv file. 
+# ------------------------------------------------------------------------------- #
+
+# Without zeros
+data <- data.frame(read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/input_full_0531.csv'))
+data <- data[-c(1,6,37,38)] # drops Python index output with csv
+data <- subset(data, select=-c(Month, DayofYear, Irrigation.Year, Sum, Diversion..cfs.))
+data['Mar_et'][is.na(data['Mar_et'])] <- 0 #fill NA et values with 0
+data['contagion'][is.na(data['contagion'])] <- 100 # fill NA contagion values with 100
+nas <- data[rowSums(is.na(data)) > 0, ] #check for any data with remaining NA values
+data <- na.omit(data)
+
+# The explanatory variables will be substracted by the mean 
+# and then divided by two standard deviations to place data on similar range. 
+
+scale2sd <- function(x){
+  (x - mean(x))/(sd(x)*2)
+}
+
+col_name <- c('ant_prcp',
+              'annual_prcp',
+              'irrig_temp',
+              'JuneAug_temp',
+              'Mar_tmp',
+              'Mar_prcp',
+              'LP_inflows',
+              'Max_Fill',
+              'Carryover',
+              'AF_used',
+              'AF_remaining',
+              'AF_available')
+
+for (i in col_name) {
+  name <- colnames(data[i])
+  new_col_name <- paste('scale_', name, sep = "")
+  data[new_col_name] <- scale2sd(data[,i])
+}
+
+## Convert percentages to proportions to get between 0 and 1
+
+col_name <- c('class1_urban',
+              'class2_crops',
+              'contagion',
+              'largest_patch_index')
+
+for (i in col_name) {
+  name <- colnames(data[i])
+  new_col_name <- paste('scale_', name, sep = "")
+  data[new_col_name] <- (data[,i])/100
+}
+
+tt <- table(data$Name)
+data <- subset(data, Name %in% names(tt[tt>4]))
+# For data with zeros
+write.csv(data, '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/input_full_0531.csv', row.names = FALSE)
 
 # ARMA MODEL ####
 
@@ -45,6 +100,10 @@ div$lt <- log(div$Acre_feet)
 # autoregressive moving average component. This goes through removing data with 
 # data gaps and making non-stationary variables, stationary.
 # ------------------------------------------------------------------------------- #
+
+# Import the dataset to work with
+div <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/input_full_0531.csv')
+div$lt <- log(div$Acre_feet)
 
 # Remove data that has 0 
 
@@ -92,7 +151,7 @@ for (i in names){
 # Check for stationary for both response and predictor variables using Dickey Fuller Test
 
 # Variables include: Annual diversion volume (Acre_feet), evapotranspiration (et), urban
-# proportion (scale_class1_urban), irrigation season precip (scale_irrig_prcp), avg max 
+# proportion (scale_class1_urban), annual precip (scale_annual_prcp), avg max 
 # irrigation season temp (scale_irrig_temp), storage water use (scale_AF_used)
 
 # Stationarity test for panel data
@@ -120,20 +179,20 @@ use.test <- purtest(new_use$AF_used, data = new_use, lags = 'AIC', test = 'levin
 lt.test <- purtest(new$lt, data = new, lags ='AIC', test = 'levinlin')
 AF.test <- purtest(new$Acre_feet, data = new, lags = 'AIC', test = 'levinlin')
 temp.test <- purtest(new$irrig_temp, data = new, lags = 'AIC', test = 'levinlin')
-prcp.test <- purtest(new$irrig_prcp, data = new, lags = 'AIC', test = 'levinlin') #non-stationary
+prcp.test <- purtest(new$annual_prcp, data = new, lags = 'AIC', test = 'levinlin') #non-stationary
 et.test <- purtest(new$et, data = new, lags = 'AIC', test = 'levinlin') # non-stationary
 
 # ET, urban, and storage use will all be differenced. Other variables don't need to be
 
 arma_input <- div_arma %>%
-  select(Name, Year, Acre_feet, irrig_temp, irrig_prcp, AF_used, class1_urban, et, lt)
+  select(Name, Year, Acre_feet, irrig_temp, annual_prcp, AF_used, class1_urban, et, lt)
 
 arma_input = arma_input %>%
   group_by(Name) %>%
   mutate(d.et = c(NA, diff(et)),
          d.urb = c(NA, diff(class1_urban)),
          d.use = c(NA, diff(AF_used)),
-         d.prcp = c(NA, diff(irrig_prcp)),
+         d.prcp = c(NA, diff(annual_prcp)),
          d.temp = c(NA, diff(irrig_temp)),
          d.Acre_feet = c(NA, diff(Acre_feet))) %>%
   ungroup()
@@ -191,32 +250,32 @@ for (i in vars){
 }
 
 # Export data for model in borah
-write.csv(arma_input, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/arma_input.csv')
+write.csv(arma_input, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/arma_input_0531.csv')
 
 # MODEL WITH NO ARMA ####
 
 # Import appropriate data 
 
-div <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/input_full.csv')
+div <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/input_full_0531.csv')
 div$lt <- log(div$Acre_feet)
 div <- subset(div, (Acre_feet > 0.00001)) # Remove data that has 0 
 
 str(div2)
 # Import file with Quinns Pond and Caldwell Lowline
-div2 <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/mixed_model_input.csv')
+div2 <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/mixed_model_input_0531.csv')
 div2$lt <- log(div2$Acre_feet)
 sel.name <- c("Quinns Pond", 'Caldwell Lowline Canal')
 div2 <- subset(div2, Name %in% sel.name)
 div_new <- rbind(div,div2)
 
 div_new <- div_new %>%
-  select(Year, Name, Acre_feet, class1_urban, et, lt, AF_used, irrig_prcp, irrig_temp)
+  select(Year, Name, Acre_feet, class1_urban, et, lt, AF_used, annual_prcp, irrig_temp) #changed from irrig_prcp to annual_prcp
 
 # Scale response variables 
 vars <- c('class1_urban',
           'et',
           'AF_used',
-          'irrig_prcp',
+          'annual_prcp', #changed from irrig_prcp to annual_prcp
           'irrig_temp')
 
 for (i in vars){
@@ -228,4 +287,4 @@ for (i in vars){
 
 
 # Export data for model in borah
-write.csv(div_new, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/glmm_input.csv')
+write.csv(div_new, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/glmm_input_0531.csv')

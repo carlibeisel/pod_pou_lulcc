@@ -12,7 +12,7 @@ library(tidyverse)
 library(dplyr)
 
 ## Import data
-div <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/input_full.csv')
+div <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/input_full_0531.csv')
 div <- div[!duplicated(div[c('Name', 'Year')]),] #remove duplicates
 div <- subset(div, (Acre_feet > 0.00001)) # Remove data that has 0 
 div_new <- subset(div, !(Name == 'Ester Simplot')) #Removes short dataframe
@@ -42,14 +42,14 @@ mlr_brm <- function(data, name) {
   
   # Select only variables going into the model
   sub_data <- sub_data[,c('Acre_feet',
-                          'scale_class1_urban',
-                          'irrig_prcp',
+                          'scale_class1_urban', 
+                          'annual_prcp',
                           'irrig_temp',
                           'et',
                           'AF_used')]
   
   #Select variables to scale around mean
-  vars_scale <- c('irrig_prcp',
+  vars_scale <- c('annual_prcp',
                   'irrig_temp')
   
   #Scale variables
@@ -65,7 +65,7 @@ mlr_brm <- function(data, name) {
   
   
   # Run the linear regression
-  and_mod<-brm(Acre_feet ~ scale_class1_urban + et + irrig_prcp + irrig_temp + AF_used, 
+  and_mod<-brm(Acre_feet ~ scale_class1_urban + et + annual_prcp + irrig_temp + AF_used, 
                data=sub_data,
                family = 'gamma',
                iter = 2000)
@@ -157,13 +157,13 @@ mlr_brm_probs <- function(data, name, remove = c('both', 'urb', 'storage', 'none
   # Select only variables going into the model
   sub_data <- sub_data[,c('Acre_feet',
                           'scale_class1_urban',
-                          'irrig_prcp',
+                          'annual_prcp',
                           'irrig_temp',
                           'et',
                           'AF_used')]
   
   #Select variables to scale around mean
-  vars_scale <- c('irrig_prcp',
+  vars_scale <- c('annual_prcp',
                   'irrig_temp')
   
   #Scale variables
@@ -181,7 +181,7 @@ mlr_brm_probs <- function(data, name, remove = c('both', 'urb', 'storage', 'none
   
   if (var == 'storage'){
     #model does not include storage water as predictor variables
-    and_mod<-brm(Acre_feet ~ scale_class1_urban + et + irrig_prcp + irrig_temp, 
+    and_mod<-brm(Acre_feet ~ scale_class1_urban + et + annual_prcp + irrig_temp, 
                  data=sub_data,
                  family = 'gamma',
                  iter = 2000, 
@@ -190,7 +190,7 @@ mlr_brm_probs <- function(data, name, remove = c('both', 'urb', 'storage', 'none
   
   if (var == 'both'){
     #run model with no urban area or storage water used 
-    and_mod<-brm(Acre_feet ~ et + irrig_prcp + irrig_temp, 
+    and_mod<-brm(Acre_feet ~ et + annual_prcp + irrig_temp, 
                  data=sub_data,
                  family = 'gamma',
                  iter = 2000,
@@ -198,7 +198,7 @@ mlr_brm_probs <- function(data, name, remove = c('both', 'urb', 'storage', 'none
   }
   if (var == 'urb'){
     # run model with no urban area
-    and_mod<-brm(Acre_feet ~ et + irrig_prcp + irrig_temp + AF_used, 
+    and_mod<-brm(Acre_feet ~ et + annual_prcp + irrig_temp + AF_used, 
                  data=sub_data,
                  family = 'gamma',
                  iter = 2000,
@@ -206,7 +206,7 @@ mlr_brm_probs <- function(data, name, remove = c('both', 'urb', 'storage', 'none
   }
   if (var == 'none') {
     # run model with all variables
-    and_mod<-brm(Acre_feet ~ scale_class1_urban + et + irrig_prcp + irrig_temp + AF_used, 
+    and_mod<-brm(Acre_feet ~ scale_class1_urban + et + annual_prcp + irrig_temp + AF_used, 
                  data=sub_data,
                  family = 'gamma',
                  iter = 2000)
@@ -307,7 +307,7 @@ mlr_brm_ns <- function(data, name, remove = c('both', 'urb', 'storage', 'none'))
   sub_data <- subset(data, Name == name)
   
   # No standardization of variables
-  sub_data$prcp.m <- sub_data$irrig_prcp/1000
+  sub_data$prcp.m <- sub_data$annual_prcp/1000
   sub_data$KAF_used <- sub_data$AF_used/10000
   
   # Run model conditionally on what needs to be removed from the analysis
