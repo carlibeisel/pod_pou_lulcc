@@ -100,3 +100,4 @@ epreddraws$unscale.et <- unscale(epreddraws$scale_d.et, df.arma$d.et)
 print('success drawing predictions')
 out_file <- paste('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/epred_et.csv')
 write.csv(epreddraws, file = out_file)
+
