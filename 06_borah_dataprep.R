@@ -90,8 +90,63 @@ for (i in col_name) {
 
 tt <- table(data$Name)
 data <- subset(data, Name %in% names(tt[tt>4]))
-# For data with zeros
+
 write.csv(data, '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/input_full_0531.csv', row.names = FALSE)
+
+
+
+# With zeros data
+data <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/mixed_model_input_0531.csv')
+data <- data[!duplicated(data[c('Name', 'Year')]),] #remove duplicates
+
+# The explanatory variables will be substracted by the mean 
+# and then divided by two standard deviations to place data on similar range. 
+
+scale2sd <- function(x){
+  (x - mean(x))/(sd(x)*2)
+}
+
+col_name <- c('ant_prcp',
+              'annual_prcp',
+              'irrig_temp',
+              'JuneAug_temp',
+              'Mar_tmp',
+              'Mar_prcp',
+              'LP_inflows',
+              'Max_Fill',
+              'Carryover',
+              'AF_used',
+              'AF_remaining',
+              'AF_available')
+
+for (i in col_name) {
+  name <- colnames(data[i])
+  new_col_name <- paste('scale_', name, sep = "")
+  data[new_col_name] <- scale2sd(data[,i])
+}
+
+## Convert percentages to proportions to get between 0 and 1
+
+col_name <- c('class1_urban',
+              'class2_crops',
+              'contagion',
+              'largest_patch_index')
+
+for (i in col_name) {
+  name <- colnames(data[i])
+  new_col_name <- paste('scale_', name, sep = "")
+  data[new_col_name] <- (data[,i])/100
+}
+
+tt <- table(data$Name)
+data <- subset(data, Name %in% names(tt[tt>4]))
+
+# Storage data 
+data$perc_used <- ifelse(data$AF_available > 0, data$AF_used/data$AF_available, NA)
+data$wr_storage <- ifelse(data$AF_available >0, 1, 0)
+
+write.csv(data, '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/mixed_model_input_0531.csv', row.names = FALSE)
+
 
 # ARMA MODEL ####
 
@@ -288,3 +343,4 @@ for (i in vars){
 
 # Export data for model in borah
 write.csv(div_new, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/glmm_input_0531.csv')
+
