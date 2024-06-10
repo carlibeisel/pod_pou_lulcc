@@ -324,13 +324,13 @@ div2 <- subset(div2, Name %in% sel.name)
 div_new <- rbind(div,div2)
 
 div_new <- div_new %>%
-  select(Year, Name, Acre_feet, class1_urban, et, lt, AF_used, annual_prcp, irrig_temp) #changed from irrig_prcp to annual_prcp
+  select(Year, Name, Acre_feet, class1_urban, et, lt, AF_used, annual_prcp, irrig_temp)
 
 # Scale response variables 
 vars <- c('class1_urban',
           'et',
           'AF_used',
-          'annual_prcp', #changed from irrig_prcp to annual_prcp
+          'annual_prcp',
           'irrig_temp')
 
 for (i in vars){
