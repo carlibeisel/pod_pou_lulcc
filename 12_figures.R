@@ -10,9 +10,9 @@ library(ggpubr) # arrange multi-plot figure
 library(dplyr) # dataframe manipulation
 library(Matrix)
 library(tidyverse) # dataframe manipulation (summaries)
-install.packages('superheat')
+#install.packages('superheat')
 library(superheat) #for heat map with na values
-install.packages('gplots')
+#install.packages('gplots')
 library(gplots)
 library(reshape2)
 library(gridExtra)
@@ -22,11 +22,11 @@ library(brms) # work with outputs of GLMMs
 library(bayesplot) # built in plots with brms
 library(tidybayes) # get clean draws from brms object
 library(modelr) # model manipulation for visualization
-install.packages('svglite')
+#install.packages('svglite')
 library(svglite) # to save ggplots as svg files to edit in inkscape
-install.packages('wesanderson')
+#install.packages('wesanderson')
 library(wesanderson) # color palette
-install.packages('ggpattern')
+#install.packages('ggpattern')
 library(ggpattern)
 library(dplyr)
 
@@ -59,14 +59,13 @@ mae <- function(model, data_compare){
 
 # MLR figures frequentist ####
 
-mlr <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/MLR_final.csv')
-div <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/input_full.csv')
+mlr <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/MLR_final_0531.csv')
+div <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/input_full_0531.csv')
 div_full <- subset(div, (Acre_feet > 0.00001))
 div_full <- subset(div_full, Name %in% unique(mlr$names))
 df = div_full %>%
   group_by(Name) %>%
   summarise(last(class1_urban)-first(class1_urban))
-mlr <- cbind(mlr, df)
 mlr$urb_change <- mlr$`last(class1_urban) - first(class1_urban)`
 
 sub.mlr <- mlr[, c('X', 'prcp.coef', 'temp.coef', 'urb.coef', 'stor.coef', 'et.coef', 'adjr2')]
@@ -283,7 +282,7 @@ box
 #here 
 
 #Import data and model 
-df.mix <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/glmm_input.csv')
+df.mix <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/glmm_input_0531.csv')
 mod.mix <- readRDS('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/mod-mix.RDS')
 
 # Posterior predictive check 
@@ -305,7 +304,7 @@ color_scheme_set('blue')
 mcmc_plot(mod.mix,
           type = 'areas',
           variable = c('b_scale_et',
-                       'b_scale_irrig_prcp',
+                       'b_scale_annual_prcp',
                        'b_scale_irrig_temp',
                        'b_scale_class1_urban',
                        'b_scale_AF_used'),
@@ -336,7 +335,7 @@ ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/figures/p
 new = df.mix %>%
   data_grid(scale_class1_urban = seq_range(scale_class1_urban, n = 200),
             scale_et = mean(scale_et),
-            scale_irrig_prcp = mean(scale_irrig_prcp),
+            scale_annual_prcp = mean(scale_annual_prcp),
             scale_irrig_temp = mean(scale_irrig_temp),
             scale_AF_used = mean(scale_AF_used))
 
@@ -381,7 +380,7 @@ change_urb <- change_urb %>%
 new = df.mix %>%
   data_grid(scale_class1_urban = mean(scale_class1_urban),
             scale_et = mean(scale_et),
-            scale_irrig_prcp = mean(scale_irrig_prcp),
+            scale_annual_prcp = mean(scale_annual_prcp),
             scale_irrig_temp = mean(scale_irrig_temp),
             scale_AF_used = seq_range(scale_AF_used, n = 200))
 
@@ -419,7 +418,7 @@ change_stor <- epreddraws %>%
 new = df.mix %>%
   data_grid(scale_class1_urban = mean(scale_class1_urban),
             scale_et = mean(scale_et),
-            scale_irrig_prcp = seq_range(scale_irrig_prcp, n = 200),
+            scale_annual_prcp = seq_range(scale_annual_prcp, n = 200),
             scale_irrig_temp = mean(scale_irrig_temp),
             scale_AF_used = mean(scale_AF_used))
 
@@ -428,7 +427,7 @@ epreddraws <-  add_epred_draws(mod.mix,
                                newdata=new,
                                ndraws=1000,
                                re_formula=NA)
-epreddraws$unscale.prcp <- unscale(epreddraws$scale_irrig_prcp, df.mix$irrig_prcp)
+epreddraws$unscale.prcp <- unscale(epreddraws$scale_annual_prcp, df.mix$annual_prcp)
 prcp <- ggplot(data=epreddraws,
                aes(x = unscale.prcp, y = .epred)) +
   stat_lineribbon(
@@ -465,8 +464,8 @@ ggsave(comb, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/m
        width = 12,
        height = 4.5)
 # Figures for Model with  ARMA ####
-df.arma <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/arma_input.csv')
-mod.arma <- readRDS('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_outputs/mod-arma-stud.RDS')
+df.arma <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/arma_input_0531.csv')
+mod.arma <- readRDS('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/mod-arma-stud.RDS')
 bayes_R2(mod.arma)
 mae_lt(mod.arma, df.arma$Acre_feet)
 
