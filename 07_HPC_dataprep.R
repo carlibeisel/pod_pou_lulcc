@@ -321,9 +321,9 @@ div2 <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/
 div2$lt <- log(div2$Acre_feet)
 sel.name <- c("Quinns Pond", 'Caldwell Lowline Canal')
 div2 <- subset(div2, Name %in% sel.name)
-div_new <- rbind(div,div2)
+glmm_input <- rbind(div,div2)
 
-div_new <- div_new %>%
+glmm_input <- glmm_input %>%
   select(Year, Name, Acre_feet, class1_urban, et, lt, AF_used, annual_prcp, irrig_temp)
 
 # Scale response variables 
@@ -334,13 +334,13 @@ vars <- c('class1_urban',
           'irrig_temp')
 
 for (i in vars){
-  var <- colnames(div_new[i])
+  var <- colnames(glmm_input[i])
   new_col_name <- paste('scale_', var, sep='')
-  col <- div_new %>% select(i)
-  div_new[new_col_name] <- scale2sd(unlist(div_new[,i]))
+  col <- glmm_input %>% select(i)
+  glmm_input[new_col_name] <- scale2sd(unlist(glmm_input[,i]))
 }
 
 
 # Export data for model in borah
-write.csv(div_new, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/glmm_input_0531.csv')
+write.csv(glmm_input, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/glmm_input_0531.csv')
 
