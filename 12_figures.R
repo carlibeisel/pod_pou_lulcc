@@ -287,7 +287,7 @@ mod.mix <- readRDS('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_outp
 
 # Posterior predictive check 
 
-pp <- pp_check(mod.mix, ndraws = 20) +
+post_pred_check <- pp_check(mod.mix, ndraws = 20) +
   theme_bw() +
   ylab('Density') +
   xlab('Discharge (AF/yr)') +
@@ -295,7 +295,7 @@ pp <- pp_check(mod.mix, ndraws = 20) +
   theme(text = element_text(size=13, family = 'Arial'))
 
 ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/figures/ppcheck-GLMM.tiff',
-       plot = pp,
+       plot = post_pred_check,
        width = 5,
        height = 4)
 
@@ -471,7 +471,7 @@ mae_lt(mod.arma, df.arma$Acre_feet)
 
 # Posterior predictive check
 
-pp <- pp_check(mod.arma, ndraws = 20) +
+post_pred_check <- pp_check(mod.arma, ndraws = 20) +
   theme_bw() +
   ylab('Density') +
   xlab('log(Discharge)') +
@@ -479,7 +479,7 @@ pp <- pp_check(mod.arma, ndraws = 20) +
   theme(text = element_text(size=13, family = 'Arial'))
 
 ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/figures/ppcheck-ARMA.tiff',
-       plot = pp,
+       plot = post_pred_check,
        width = 5,
        height = 4)
 
