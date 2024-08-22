@@ -20,7 +20,7 @@ library(mvtnorm) #multivariate distributions
 library(caret) # for train command
 
 # Import the data
-div <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/input_full_0531.csv')
+div <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/model_input_0822.csv')
 div <- div[!duplicated(div[c('Name', 'Year')]),] #remove duplicates
 div <- subset(div, (Acre_feet > 0.00001)) # Remove data that has 0 
 div_new <- subset(div, !(Name == 'Ester Simplot')) #Removes short dataframe
@@ -38,14 +38,19 @@ mlr_run <- function(data, name) {
   
   # Select only variables going into the model
   sub_data <- sub_data[,c('Acre_feet',
-                          'scale_class1_urban',
-                          'annual_prcp', #changed irrig_prcp to annual_prcp
+                          'class1_urban',
+                          'irrig_prcp',
                           'irrig_temp',
                           'et',
-                          'AF_used')]
+                          'AF_used',
+                          'Carryover',
+                          'ubrb_prcp',
+                          'pivot_prop',
+                          'sw_wr',
+                          'gw_wr')]
   
   #Select variables to scale around mean
-  vars_scale <- c('annual_prcp', #changed from irrig_prcp
+  vars_scale <- c('irrig_prcp', #changed from irrig_prcp
                   'irrig_temp')
   
   #Scale variables
@@ -125,6 +130,19 @@ df$et <- NA
 df$et.coef <- NA
 df$et.p <- NA
 df$adjr2 <- NA
+df$ubrb_prcp <- NA
+df$ubrb_prcp.coef <- NA
+df$ubrb_prcp.p <- NA
+df$sw_wr <- NA
+df$sw_wr.coef <- NA
+df$sw_wr.p <- NA
+df$gw_wr <- NA
+df$gw_wr.coef <- NA
+df$gw_wr.p <- NA
+df$carryover <- NA
+df$carryover.coef <- NA
+df$carryover.p <- NA
+
 
 for (i in 1:60) {
   name <- names[i]
@@ -203,6 +221,6 @@ for (i in 1:60) {
   adjr2 <- output$adjr2
   df[i, 'adjr2'] <- adjr2
 }
-df$vars <- rowSums(df[,c('et', 'temp','prcp','urb','stor')])
+df$vars <- rowSums(df[,c('et', 'temp','prcp','urb','stor','sw_wr','gw_wr', 'ubrb_prcp', 'carryover')])
 
-write.csv(df, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/MLR_final_0531.csv')
+write.csv(df, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/MLR_final_0822.csv')
