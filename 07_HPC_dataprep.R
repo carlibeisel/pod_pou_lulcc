@@ -315,13 +315,13 @@ for (i in vars){
 }
 
 # Export data for model in borah
-write.csv(arma_input, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/arma_input_0531.csv')
+write.csv(arma_input, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/arma_input_0822.csv')
 
 # MODEL WITH NO ARMA ####
 
 # Import appropriate data 
 
-div <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/input_full_0531.csv')
+div <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/input_full_0822.csv')
 div$lt <- log(div$Acre_feet)
 div <- subset(div, (Acre_feet > 0.00001)) # Remove data that has 0 
 
@@ -352,5 +352,5 @@ for (i in vars){
 
 
 # Export data for model in borah
-write.csv(glmm_input, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/glmm_input_0531.csv')
+write.csv(glmm_input, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/glmm_input_0822.csv')
 
