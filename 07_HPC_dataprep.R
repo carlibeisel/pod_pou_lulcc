@@ -41,7 +41,7 @@ library(dplyr)
 # ------------------------------------------------------------------------------- #
 
 # Without zeros
-data <- data.frame(read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/input_full_0531.csv'))
+data <- data.frame(read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/input_full_0822.csv'))
 data <- data[-c(1,6,37,38)] # drops Python index output with csv
 data <- subset(data, select=-c(Month, DayofYear, Irrigation.Year, Sum, Diversion..cfs.))
 data['Mar_et'][is.na(data['Mar_et'])] <- 0 #fill NA et values with 0
@@ -57,7 +57,7 @@ scale2sd <- function(x){
 }
 
 col_name <- c('ant_prcp',
-              'annual_prcp',
+              'irrig_prcp',
               'irrig_temp',
               'JuneAug_temp',
               'Mar_tmp',
@@ -67,7 +67,12 @@ col_name <- c('ant_prcp',
               'Carryover',
               'AF_used',
               'AF_remaining',
-              'AF_available')
+              'AF_available',
+              'ubrb_prcp',
+              'sw_wr',
+              'gw_wr',
+              'total_wr',
+              'pivot_prop')
 
 for (i in col_name) {
   name <- colnames(data[i])
@@ -91,12 +96,12 @@ for (i in col_name) {
 tt <- table(data$Name)
 data <- subset(data, Name %in% names(tt[tt>4]))
 
-write.csv(data, '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/input_full_0531.csv', row.names = FALSE)
+write.csv(data, '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/input_full_0822.csv', row.names = FALSE)
 
 
 
 # With zeros data
-data <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/mixed_model_input_0531.csv')
+data <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/mixed_model_input_0822.csv')
 data <- data[!duplicated(data[c('Name', 'Year')]),] #remove duplicates
 
 # The explanatory variables will be substracted by the mean 
@@ -107,7 +112,7 @@ scale2sd <- function(x){
 }
 
 col_name <- c('ant_prcp',
-              'annual_prcp',
+              'irrig_prcp',
               'irrig_temp',
               'JuneAug_temp',
               'Mar_tmp',
@@ -117,7 +122,12 @@ col_name <- c('ant_prcp',
               'Carryover',
               'AF_used',
               'AF_remaining',
-              'AF_available')
+              'AF_available',
+              'ubrb_prcp',
+              'sw_wr',
+              'gw_wr',
+              'total_wr',
+              'pivot_prop')
 
 for (i in col_name) {
   name <- colnames(data[i])
@@ -145,7 +155,7 @@ data <- subset(data, Name %in% names(tt[tt>4]))
 data$perc_used <- ifelse(data$AF_available > 0, data$AF_used/data$AF_available, NA)
 data$wr_storage <- ifelse(data$AF_available >0, 1, 0)
 
-write.csv(data, '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/mixed_model_input_0531.csv', row.names = FALSE)
+write.csv(data, '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/mixed_model_input_0822.csv', row.names = FALSE)
 
 
 # ARMA MODEL ####
@@ -157,7 +167,7 @@ write.csv(data, '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/m
 # ------------------------------------------------------------------------------- #
 
 # Import the dataset to work with
-div <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/input_full_0531.csv')
+div <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/input_full_0822.csv')
 div$lt <- log(div$Acre_feet)
 
 # Remove data that has 0 
