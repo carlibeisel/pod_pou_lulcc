@@ -259,6 +259,10 @@ arma_input = arma_input %>%
          d.use = c(NA, diff(AF_used)),
          d.prcp = c(NA, diff(annual_prcp)),
          d.temp = c(NA, diff(irrig_temp)),
+         d.ubrb_prcp = c(NA, diff(ubrb_prcp)),
+         d.pivot_prop = c(NA, diff(pivot_prop)),
+         d.sw_wr = c(NA, diff(sw_wr)),
+         d.gw_wr = c(NA, diff(gw_we)),
          d.Acre_feet = c(NA, diff(Acre_feet))) %>%
   ungroup()
 arma_input <- na.omit(arma_input)
@@ -270,6 +274,11 @@ arma_input$d.use <- as.numeric(arma_input$d.use)
 arma_input$d.Acre_feet <- as.numeric(arma_input$d.Acre_feet)
 arma_input$d.urb <- as.numeric(arma_input$d.urb)
 arma_input$d.prcp <- as.numeric(arma_input$d.prcp)
+arma_input$d.ubrb_prcp <- as.numeric(arma_input$d.ubrb_prcp)
+arma_input$d.Carryover <- as.numeric(arma_input$d.Carryover)
+arma_input$d.pivot_prop <- as.numeric(arma_input$d.pivot_prop)
+arma_input$d.sw_wr <- as.numeric(arma_input$d.sw_wr)
+arma_input$d.gw_wr <- as.numeric(arma_input$d.gw_wr)
 
 # Check for stationarity in groups that were differenced 
 
@@ -305,6 +314,11 @@ vars <- c('d.use',
           'd.urb',
           'd.prcp',
           'd.temp',
+          'd.ubrb_prcp',
+          'd.pivot_prop',
+          'd.Carryover',
+          'd.sw_wr',
+          'd.gw_wr',
           'd.et')
 
 for (i in vars){
