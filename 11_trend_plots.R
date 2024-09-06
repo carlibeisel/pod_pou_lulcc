@@ -21,7 +21,7 @@ library(ggpubr) # arrange a grid of plots
 library(plyr)
 
 # Read in the data  ####
-div <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/input_full_0531.csv')
+div <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/input_full_0906.csv')
 div_full <- subset(div, (Acre_feet > 0.00001))
 
 sub <- div_full %>%

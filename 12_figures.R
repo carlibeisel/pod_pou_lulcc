@@ -277,13 +277,16 @@ box <- ggplot(data = sum.df, aes(x = vars, y = Estimate)) +
 
 box
 
-# Figures for Model with no ARMA ####
 
-#here 
+# -------------------------------------------#
+
+#       Figures for Model with no ARMA    ####
+
+# -------------------------------------------#
 
 #Import data and model 
-df.mix <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/glmm_input_0531.csv')
-mod.mix <- readRDS('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/mod-mix.RDS')
+df.mix <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/glmm_input_0906.csv')
+mod.mix <- readRDS('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/mod2-glmm.RDS')
 
 # Posterior predictive check 
 
@@ -304,17 +307,23 @@ color_scheme_set('blue')
 mcmc_plot(mod.mix,
           type = 'areas',
           variable = c('b_scale_et',
-                       'b_scale_annual_prcp',
+                       'b_scale_irrig_prcp',
                        'b_scale_irrig_temp',
+                       'b_scale_ubrb_prcp',
                        'b_scale_class1_urban',
-                       'b_scale_AF_used'),
+                       'b_scale_sw_wr',
+                       'b_scale_AF_used',
+                       'b_scale_Carryover'),
           prob = 0.95) +
   theme_bw() +
   vline_0() +
   scale_y_discrete(labels = c('Evapotranspiration',
-                              'Precipitation',
-                              'Temperature',
+                              'Irrig. Precip.',
+                              'Irrig. Temp.',
+                              'UBRB Precip',
                               'Urban Percentage',
+                              'SW Water Rights',
+                              'Reservoir Carryover',
                               'Storage Water Use')) + 
   scale_fill_manual(values = c('Evapotranspiration' = 'grey',
                                'Precipitation' = '#00798c',
@@ -328,18 +337,22 @@ ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/figures/p
        height = 6,
        units = 'in')
 
-# Marginal effects plots 
+## -------------------------------------------------##
+##          Marginal Effect Figures                 ##                                          
+## -------------------------------------------------##
 
 # URBAN ##
-#Simulate data
+
 new = df.mix %>%
   data_grid(scale_class1_urban = seq_range(scale_class1_urban, n = 200),
             scale_et = mean(scale_et),
-            scale_annual_prcp = mean(scale_annual_prcp),
+            scale_irrig_prcp = mean(scale_irrig_prcp),
             scale_irrig_temp = mean(scale_irrig_temp),
-            scale_AF_used = mean(scale_AF_used))
+            scale_AF_used = mean(scale_AF_used),
+            scale_Carryover = mean(scale_Carryover),
+            scale_sw_wr = mean (scale_sw_wr),
+            scale_ubrb_prcp = mean (scale_ubrb_prcp))
 
-# Expected predicted draws
 epreddraws <-  add_epred_draws(mod.mix, 
                                newdata=new,
                                ndraws=1000,
@@ -375,16 +388,20 @@ change_urb <- change_urb %>%
                         NA, NA, NA, NA, diff(med, lag = 24))))
 
 
+
+
 # Storage ##
-#Simulate data
+
 new = df.mix %>%
   data_grid(scale_class1_urban = mean(scale_class1_urban),
             scale_et = mean(scale_et),
-            scale_annual_prcp = mean(scale_annual_prcp),
+            scale_irrig_prcp = mean(scale_irrig_prcp),
             scale_irrig_temp = mean(scale_irrig_temp),
-            scale_AF_used = seq_range(scale_AF_used, n = 200))
+            scale_AF_used = seq_range(scale_AF_used, n = 200),
+            scale_Carryover = mean(scale_Carryover),
+            scale_sw_wr = mean (scale_sw_wr),
+            scale_ubrb_prcp = mean (scale_ubrb_prcp))
 
-# Expected predicted draws
 epreddraws <-  add_epred_draws(mod.mix, 
                                newdata=new,
                                ndraws=1000,
@@ -413,21 +430,25 @@ change_stor <- epreddraws %>%
   summarise(med = median(.epred),
             avg = mean(.epred))
 
-# Precip ##
-#Simulate data
+
+
+# Irrig Season Precip ##
+
 new = df.mix %>%
   data_grid(scale_class1_urban = mean(scale_class1_urban),
             scale_et = mean(scale_et),
-            scale_annual_prcp = seq_range(scale_annual_prcp, n = 200),
+            scale_irrig_prcp = seq_range(scale_irrig_prcp, n = 200),
             scale_irrig_temp = mean(scale_irrig_temp),
-            scale_AF_used = mean(scale_AF_used))
+            scale_AF_used = mean(scale_AF_used),
+            scale_Carryover = mean(scale_Carryover),
+            scale_sw_wr = mean (scale_sw_wr),
+            scale_ubrb_prcp = mean (scale_ubrb_prcp))
 
-# Expected predicted draws
 epreddraws <-  add_epred_draws(mod.mix, 
                                newdata=new,
                                ndraws=1000,
                                re_formula=NA)
-epreddraws$unscale.prcp <- unscale(epreddraws$scale_annual_prcp, df.mix$annual_prcp)
+epreddraws$unscale.prcp <- unscale(epreddraws$scale_irrig_prcp, df.mix$irrig_prcp)
 prcp <- ggplot(data=epreddraws,
                aes(x = unscale.prcp, y = .epred)) +
   stat_lineribbon(
@@ -459,15 +480,265 @@ change_prcp <- epreddraws %>%
                     NA, NA, NA, diff(med, lag = 73)))
 
 
-comb <- ggarrange(urban, prcp, stor, ncol = 3, labels = c('A', 'B', 'C'))
+
+# Irrigation Season Temp ##
+
+new = df.mix %>%
+  data_grid(scale_class1_urban = mean(scale_class1_urban),
+            scale_et = mean(scale_et),
+            scale_irrig_prcp = mean(scale_irrig_prcp),
+            scale_irrig_temp = seq_range(scale_irrig_temp, n = 200),
+            scale_AF_used = mean(scale_AF_used),
+            scale_Carryover = mean(scale_Carryover),
+            scale_sw_wr = mean (scale_sw_wr),
+            scale_ubrb_prcp = mean (scale_ubrb_prcp))
+
+epreddraws <-  add_epred_draws(mod.mix, 
+                               newdata=new,
+                               ndraws=1000,
+                               re_formula=NA)
+epreddraws$unscale.temp <- unscale(epreddraws$scale_temp, df.mix$temp)
+temp <- ggplot(data=epreddraws,
+               aes(x = unscale.temp, y = .epred)) +
+  stat_lineribbon(
+    .width = c(.5), alpha = 0.35, fill="#00798c", 
+    color="black", size=2) + 
+  ylab("Canal Discharge (Acre-ft/yr)") + xlab("Avg. Max. Irrig. Temp. (F)") +
+  theme_bw() +
+  theme(text = element_text(size = 13)) +
+  scale_y_continuous(labels = scales::comma) +
+  coord_cartesian(ylim = c(400, 2000))
+temp
+ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/figures/mix-temp.tiff',
+       plot = temp,
+       width = 4,
+       height = 4,
+       units = 'in')
+change_temp <- epreddraws %>%
+  select(.epred, unscale.temp) %>%
+  group_by(unscale.temp) %>%
+  summarise(med = median(.epred),
+            avg = mean(.epred)) %>%
+  mutate(change = c(NA, NA, NA, NA, NA,NA, NA, NA, NA, NA,
+                    NA, NA, NA, NA, NA,NA, NA, NA, NA, NA,
+                    NA, NA, NA, NA, NA,NA, NA, NA, NA, NA,
+                    NA, NA, NA, NA, NA,NA, NA, NA, NA, NA,
+                    NA, NA, NA, NA, NA,NA, NA, NA, NA, NA,
+                    NA, NA, NA, NA, NA,NA, NA, NA, NA, NA,
+                    NA, NA, NA, NA, NA,NA, NA, NA, NA, NA,
+                    NA, NA, NA, diff(med, lag = 73)))
+
+# Irrigation Season ET ##
+
+new = df.mix %>%
+  data_grid(scale_class1_urban = mean(scale_class1_urban),
+            scale_et = seq_range(scale_et, n = 200),
+            scale_irrig_prcp = mean(scale_irrig_prcp),
+            scale_irrig_temp = mean(scale_irrig_temp),
+            scale_AF_used = mean(scale_AF_used),
+            scale_Carryover = mean(scale_Carryover),
+            scale_sw_wr = mean (scale_sw_wr),
+            scale_ubrb_prcp = mean (scale_ubrb_prcp))
+
+epreddraws <-  add_epred_draws(mod.mix, 
+                               newdata=new,
+                               ndraws=1000,
+                               re_formula=NA)
+epreddraws$unscale.et <- unscale(epreddraws$scale_et, df.mix$et)
+et <- ggplot(data=epreddraws,
+               aes(x = unscale.et, y = .epred)) +
+  stat_lineribbon(
+    .width = c(.5), alpha = 0.35, fill="#00798c", 
+    color="black", size=2) + 
+  ylab("Canal Discharge (Acre-ft/yr)") + xlab("Evapotranspiration (in)") +
+  theme_bw() +
+  theme(text = element_text(size = 13)) +
+  scale_y_continuous(labels = scales::comma) +
+  coord_cartesian(ylim = c(400, 2000))
+et
+ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/figures/mix-et.tiff',
+       plot = et,
+       width = 4,
+       height = 4,
+       units = 'in')
+change_et <- epreddraws %>%
+  select(.epred, unscale.et) %>%
+  group_by(unscale.et) %>%
+  summarise(med = median(.epred),
+            avg = mean(.epred)) %>%
+  mutate(change = c(NA, NA, NA, NA, NA,NA, NA, NA, NA, NA,
+                    NA, NA, NA, NA, NA,NA, NA, NA, NA, NA,
+                    NA, NA, NA, NA, NA,NA, NA, NA, NA, NA,
+                    NA, NA, NA, NA, NA,NA, NA, NA, NA, NA,
+                    NA, NA, NA, NA, NA,NA, NA, NA, NA, NA,
+                    NA, NA, NA, NA, NA,NA, NA, NA, NA, NA,
+                    NA, NA, NA, NA, NA,NA, NA, NA, NA, NA,
+                    NA, NA, NA, diff(med, lag = 73)))
+
+# UBRB Precip ##
+
+new = df.mix %>%
+  data_grid(scale_class1_urban = mean(scale_class1_urban),
+            scale_et = mean(scale_et),
+            scale_irrig_prcp = mean(scale_irrig_prcp),
+            scale_irrig_temp = mean(scale_irrig_temp),
+            scale_AF_used = mean(scale_AF_used),
+            scale_Carryover = mean(scale_Carryover),
+            scale_sw_wr = mean (scale_sw_wr),
+            scale_ubrb_prcp = seq_range (scale_ubrb_prcp, n = 200))
+
+epreddraws <-  add_epred_draws(mod.mix, 
+                               newdata=new,
+                               ndraws=1000,
+                               re_formula=NA)
+epreddraws$unscale.ubrb_prcp <- unscale(epreddraws$scale_ubrb_prcp, df.mix$ubrb_prcp)
+ubrb_prcp <- ggplot(data=epreddraws,
+               aes(x = unscale.ubrb_prcp, y = .epred)) +
+  stat_lineribbon(
+    .width = c(.5), alpha = 0.35, fill="#00798c", 
+    color="black", size=2) + 
+  ylab("Canal Discharge (Acre-ft/yr)") + xlab("Avg Water Year Precipitation (mm/yr)") +
+  theme_bw() +
+  theme(text = element_text(size = 13)) +
+  scale_y_continuous(labels = scales::comma) +
+  coord_cartesian(ylim = c(400, 2000))
+ubrb_prcp
+ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/figures/mix-ubrb_prcp.tiff',
+       plot = ubrb_prcp,
+       width = 4,
+       height = 4,
+       units = 'in')
+change_ubrb_prcp <- epreddraws %>%
+  select(.epred, unscale.ubrb_prcp) %>%
+  group_by(unscale.ubrb_prcp) %>%
+  summarise(med = median(.epred),
+            avg = mean(.epred)) %>%
+  mutate(change = c(NA, NA, NA, NA, NA,NA, NA, NA, NA, NA,
+                    NA, NA, NA, NA, NA,NA, NA, NA, NA, NA,
+                    NA, NA, NA, NA, NA,NA, NA, NA, NA, NA,
+                    NA, NA, NA, NA, NA,NA, NA, NA, NA, NA,
+                    NA, NA, NA, NA, NA,NA, NA, NA, NA, NA,
+                    NA, NA, NA, NA, NA,NA, NA, NA, NA, NA,
+                    NA, NA, NA, NA, NA,NA, NA, NA, NA, NA,
+                    NA, NA, NA, diff(med, lag = 73)))
+
+
+
+
+# SW Water rights ##
+new = df.mix %>%
+  data_grid(scale_class1_urban = mean(scale_class1_urban),
+            scale_et = mean(scale_et),
+            scale_irrig_prcp = mean(scale_irrig_prcp),
+            scale_irrig_temp = mean(scale_irrig_temp),
+            scale_AF_used = mean(scale_AF_used),
+            scale_Carryover = mean(scale_Carryover),
+            scale_sw_wr = seq_range (scale_sw_wr, n = 200),
+            scale_ubrb_prcp = mean (scale_ubrb_prcp))
+
+epreddraws <-  add_epred_draws(mod.mix, 
+                               newdata=new,
+                               ndraws=1000,
+                               re_formula=NA)
+epreddraws$unscale.sw_wr <- unscale(epreddraws$scale_sw_wr, df.mix$sw_wr)
+sw_wr <- ggplot(data=epreddraws,
+                    aes(x = unscale.sw_wr, y = .epred)) +
+  stat_lineribbon(
+    .width = c(.5), alpha = 0.35, fill="#00798c", 
+    color="black", size=2) + 
+  ylab("Canal Discharge (Acre-ft/yr)") + xlab("SW Water Rights (count)") +
+  theme_bw() +
+  theme(text = element_text(size = 13)) +
+  scale_y_continuous(labels = scales::comma) +
+  coord_cartesian(ylim = c(400, 2000))
+sw_wr
+ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/figures/mix-sw_wr.tiff',
+       plot = sw_wr,
+       width = 4,
+       height = 4,
+       units = 'in')
+change_sw_wr <- epreddraws %>%
+  select(.epred, unscale.sw_wr) %>%
+  group_by(unscale.sw_wr) %>%
+  summarise(med = median(.epred),
+            avg = mean(.epred)) %>%
+  mutate(change = c(NA, NA, NA, NA, NA,NA, NA, NA, NA, NA,
+                    NA, NA, NA, NA, NA,NA, NA, NA, NA, NA,
+                    NA, NA, NA, NA, NA,NA, NA, NA, NA, NA,
+                    NA, NA, NA, NA, NA,NA, NA, NA, NA, NA,
+                    NA, NA, NA, NA, NA,NA, NA, NA, NA, NA,
+                    NA, NA, NA, NA, NA,NA, NA, NA, NA, NA,
+                    NA, NA, NA, NA, NA,NA, NA, NA, NA, NA,
+                    NA, NA, NA, diff(med, lag = 73)))
+
+
+# Carryover ##
+new = df.mix %>%
+  data_grid(scale_class1_urban = mean(scale_class1_urban),
+            scale_et = mean(scale_et),
+            scale_irrig_prcp = mean(scale_irrig_prcp),
+            scale_irrig_temp = mean(scale_irrig_temp),
+            scale_AF_used = mean(scale_AF_used),
+            scale_Carryover = seq_range (scale_Carryover, n = 200),
+            scale_sw_wr = mean (scale_sw_wr),
+            scale_ubrb_prcp = mean (scale_ubrb_prcp))
+
+epreddraws <-  add_epred_draws(mod.mix, 
+                               newdata=new,
+                               ndraws=1000,
+                               re_formula=NA)
+epreddraws$unscale.Carryover <- unscale(epreddraws$scale_Carryover, df.mix$Carryoverr)
+Carryover <- ggplot(data=epreddraws,
+                aes(x = unscale.Carryover, y = .epred)) +
+  stat_lineribbon(
+    .width = c(.5), alpha = 0.35, fill="#00798c", 
+    color="black", size=2) + 
+  ylab("Canal Discharge (Acre-ft/yr)") + xlab("Reservoir Carryover (AF)") +
+  theme_bw() +
+  theme(text = element_text(size = 13)) +
+  scale_y_continuous(labels = scales::comma) +
+  coord_cartesian(ylim = c(400, 2000))
+Carryover
+ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/figures/mix-Carryover.tiff',
+       plot = Carryover,
+       width = 4,
+       height = 4,
+       units = 'in')
+change_Carryover <- epreddraws %>%
+  select(.epred, unscale.Carryover) %>%
+  group_by(unscale.Carryover) %>%
+  summarise(med = median(.epred),
+            avg = mean(.epred)) %>%
+  mutate(change = c(NA, NA, NA, NA, NA,NA, NA, NA, NA, NA,
+                    NA, NA, NA, NA, NA,NA, NA, NA, NA, NA,
+                    NA, NA, NA, NA, NA,NA, NA, NA, NA, NA,
+                    NA, NA, NA, NA, NA,NA, NA, NA, NA, NA,
+                    NA, NA, NA, NA, NA,NA, NA, NA, NA, NA,
+                    NA, NA, NA, NA, NA,NA, NA, NA, NA, NA,
+                    NA, NA, NA, NA, NA,NA, NA, NA, NA, NA,
+                    NA, NA, NA, diff(med, lag = 73)))
+
+
+
+# ALL
+comb <- ggarrange(sw_wr, ubrb_prcp, Carryover, urban, prcp, stor, et, temp, ncol=2, nrow = 4, labels = c('A', 'B', 'C','D','E','F','G','H'))
 ggsave(comb, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/marg-GLMM-all.tiff',
        width = 12,
        height = 4.5)
-# Figures for Model with  ARMA ####
-df.arma <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/arma_input_0531.csv')
-mod.arma <- readRDS('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/mod-arma-stud.RDS')
+
+
+# -------------------------------------------#
+
+#       Figures for Model with    ARMA    ####
+
+# -------------------------------------------#
+
+df.arma <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/arma_input_0906.csv')
+mod.arma <- readRDS('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/mod2-arma-stud.RDS')
 bayes_R2(mod.arma)
 mae_lt(mod.arma, df.arma$Acre_feet)
+
+
 
 # Posterior predictive check
 
@@ -490,17 +761,23 @@ mcmc_plot(mod.arma,
           type = 'areas',
           variable = c('b_scale_d.et',
                        'b_scale_d.prcp',
+                       'b_scale_d.ubrb_prcp',
                        'b_scale_d.temp',
                        'b_scale_d.urb',
-                       'b_scale_d.use'),
+                       'b_scale_d.sw_wr',
+                       'b_scale_d.use',
+                       'b_scale_d.Carryover'),
           prob = 0.95) +
   theme_bw() +
   vline_0() +
   scale_y_discrete(labels = c('Evapotranspiration',
-                              'Precipitation',
-                              'Temperature',
+                              'Irrig. Precip.',
+                              'UBRB Precip.',
+                              'Irrig. Temp.',
                               'Urban Percentage',
-                              'Storage Water Use')) +
+                              'SW Water Rights',
+                              'Storage Water Use',
+                              'Res. Carryover')) +
   xlab('Relative Effect Size (log)') +
   theme(text = element_text(size=18, family = 'Arial'))
 ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/figures/post-arma.svg', 
@@ -543,6 +820,8 @@ change_prcp <- prcp_epred %>%
                        diff(unscale.prcp, lag = 25)))
 mean(change_prcp$differ_pred, na.rm = T)
 
+
+
 # ET plot 
 et_epred <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/epred_et.csv')
 et <- ggplot(data=et_epred,
@@ -573,7 +852,11 @@ change_et <- et_epred %>%
                        diff(et_mm, lag = 12)))
 mean(change_et$differ_pred, na.rm = T)
 
+
+
 # Temp plot 
+
+
 temp_epred <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/epred_temp.csv')
 temp <- ggplot(data=temp_epred,
                aes(x = unscale.temp, y = exp(.epred))) +
@@ -603,7 +886,10 @@ change_temp <- temp_epred %>%
                        diff(unscale.temp, lag = 16)))
 mean(change_temp$differ_pred, na.rm = T)
 
+
+
 # Storage plot
+
 stor_epred <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/epred_use.csv')
 stor_epred$KAF <- stor_epred$unscale.use/1000
 stor <- ggplot(data=stor_epred,
@@ -631,7 +917,19 @@ change_stor <- stor_epred %>%
                        diff(unscale.use, lag = 8)))
 mean(change_stor$differ_pred, na.rm = T)
 
+
+
+# UBRB Precip
+
+# SW Water Rights
+
+# Reservoir Carryover 
+
+
+# ALL
+
 final <- ggarrange(temp, et, prcp, stor, nrow = 2, ncol = 2, labels = c('A', 'B', 'C', 'D'))
 ggsave(final, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/figures/grid-arma.tiff',
        width = 9,
        height = 9)
+
