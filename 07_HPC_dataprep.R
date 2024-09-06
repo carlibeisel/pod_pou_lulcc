@@ -42,12 +42,15 @@ library(dplyr)
 
 # Without zeros
 data <- data.frame(read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/input_full_0906.csv'))
-data <- data[-c(1,6,37,38)] # drops Python index output with csv
+print(colnames(data))
+data <- data[-c(1,6)] # drops Python index output with csv
+#data <- data[-c(1,6,37,38)] # drops Python index output with csv
 data <- subset(data, select=-c(Month, DayofYear, Irrigation.Year, Sum, Diversion..cfs.))
 data['Mar_et'][is.na(data['Mar_et'])] <- 0 #fill NA et values with 0
 data['contagion'][is.na(data['contagion'])] <- 100 # fill NA contagion values with 100
 nas <- data[rowSums(is.na(data)) > 0, ] #check for any data with remaining NA values
 data <- na.omit(data)
+
 
 # The explanatory variables will be substracted by the mean 
 # and then divided by two standard deviations to place data on similar range. 
@@ -72,6 +75,7 @@ col_name <- c('ant_prcp',
               'sw_wr',
               'gw_wr',
               'total_wr')
+
 
 for (i in col_name) {
   name <- colnames(data[i])
@@ -244,11 +248,12 @@ AF.test <- purtest(new$Acre_feet, data = new, lags = 'AIC', test = 'levinlin')
 temp.test <- purtest(new$irrig_temp, data = new, lags = 'AIC', test = 'levinlin')
 prcp.test <- purtest(new$irrig_prcp, data = new, lags = 'AIC', test = 'levinlin') #non-stationary
 et.test <- purtest(new$et, data = new, lags = 'AIC', test = 'levinlin') # non-stationary
+ubrb_prcp.test <- purtest(new$ubrb_prcp, data = new, lags = 'AIC', test = 'levinlin') # non-stationary
 
 # ET, urban, and storage use will all be differenced. Other variables don't need to be
 
 arma_input <- div_arma %>%
-  select(Name, Year, Acre_feet, irrig_temp, irrig_prcp, AF_used, class1_urban, et, lt)
+  select(Name, Year, Acre_feet, irrig_temp, irrig_prcp, AF_used, class1_urban, et, lt, ubrb_prcp, sw_wr, gw_wr, Carryover)
 
 arma_input = arma_input %>%
   group_by(Name) %>%
@@ -257,10 +262,10 @@ arma_input = arma_input %>%
          d.use = c(NA, diff(AF_used)),
          d.prcp = c(NA, diff(irrig_prcp)),
          d.temp = c(NA, diff(irrig_temp)),
+         d.Carryover = c(NA, diff(Carryover)),
          d.ubrb_prcp = c(NA, diff(ubrb_prcp)),
-         d.pivot_prop = c(NA, diff(pivot_prop)),
          d.sw_wr = c(NA, diff(sw_wr)),
-         d.gw_wr = c(NA, diff(gw_we)),
+         d.gw_wr = c(NA, diff(gw_wr)),
          d.Acre_feet = c(NA, diff(Acre_feet))) %>%
   ungroup()
 arma_input <- na.omit(arma_input)
@@ -274,7 +279,6 @@ arma_input$d.urb <- as.numeric(arma_input$d.urb)
 arma_input$d.prcp <- as.numeric(arma_input$d.prcp)
 arma_input$d.ubrb_prcp <- as.numeric(arma_input$d.ubrb_prcp)
 arma_input$d.Carryover <- as.numeric(arma_input$d.Carryover)
-arma_input$d.pivot_prop <- as.numeric(arma_input$d.pivot_prop)
 arma_input$d.sw_wr <- as.numeric(arma_input$d.sw_wr)
 arma_input$d.gw_wr <- as.numeric(arma_input$d.gw_wr)
 
@@ -313,7 +317,6 @@ vars <- c('d.use',
           'd.prcp',
           'd.temp',
           'd.ubrb_prcp',
-          'd.pivot_prop',
           'd.Carryover',
           'd.sw_wr',
           'd.gw_wr',
@@ -327,33 +330,37 @@ for (i in vars){
 }
 
 # Export data for model in borah
-write.csv(arma_input, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/arma_input_0822.csv')
+write.csv(arma_input, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/arma_input_0906.csv')
 
 # MODEL WITH NO ARMA ####
 
 # Import appropriate data 
 
-div <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/input_full_0822.csv')
+div <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/input_full_0906.csv')
 div$lt <- log(div$Acre_feet)
 div <- subset(div, (Acre_feet > 0.00001)) # Remove data that has 0 
 
 str(div2)
 # Import file with Quinns Pond and Caldwell Lowline
-div2 <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/mixed_model_input_0531.csv')
+div2 <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/mixed_model_input_0906.csv')
 div2$lt <- log(div2$Acre_feet)
 sel.name <- c("Quinns Pond", 'Caldwell Lowline Canal')
 div2 <- subset(div2, Name %in% sel.name)
 glmm_input <- rbind(div,div2)
 
 glmm_input <- glmm_input %>%
-  select(Year, Name, Acre_feet, class1_urban, et, lt, AF_used, irrig_prcp, irrig_temp)
+  select(Year, Name, Acre_feet, class1_urban, et, lt, AF_used, irrig_prcp, irrig_temp, ubrb_prcp, sw_wr, gw_wr, Carryover)
 
 # Scale response variables 
 vars <- c('class1_urban',
           'et',
           'AF_used',
           'irrig_prcp',
-          'irrig_temp')
+          'irrig_temp',
+          'ubrb_prcp',
+          'sw_wr',
+          'gw_wr',
+          'Carryover')
 
 for (i in vars){
   var <- colnames(glmm_input[i])
@@ -362,7 +369,6 @@ for (i in vars){
   glmm_input[new_col_name] <- scale2sd(unlist(glmm_input[,i]))
 }
 
-
 # Export data for model in borah
-write.csv(glmm_input, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/glmm_input_0822.csv')
+write.csv(glmm_input, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/glmm_input_0906.csv')
 
