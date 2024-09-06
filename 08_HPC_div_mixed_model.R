@@ -10,7 +10,7 @@
 
 # Import packages
 
-library(brms) # Do bayesian models, use function brm
+library(brms) 
 library(tidyverse) # 
 library(dplyr)
 library(readr)
@@ -24,7 +24,7 @@ library(modelr)
 ###### Import the data #
 
 print('Import diversion data for ARMA model')
-diversions <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/arma_input_0531.csv')
+diversions <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/arma_input_0906.csv')
 diversions <- diversions[!duplicated(diversions[c('Name', 'Year')]),] #remove duplicates
 diversions <- na.omit(diversions)
 
@@ -38,12 +38,15 @@ priors <- c(
   set_prior('normal(0,1)', class = 'b', coef = 'scale_d.prcp'),
   set_prior('normal(0,1)', class = 'b', coef = 'scale_d.temp'),
   set_prior('normal(0,1)', class = 'b', coef = 'scale_d.et'), 
+  set_prior('normal(0,1)', class = 'b', coef = 'scale_d.ubrb_prcp'), 
+  set_prior('normal(0,1)', class = 'b', coef = 'scale_d.Carryover'), 
+  set_prior('normal(0,1)', class = 'b', coef = 'scale_d.sw_wr'), 
   set_prior('lkj_corr_cholesky(2)', class = 'L')
 )
 
 print('Create model with ARMA terms and student-t family')
 # brms is used to run mixed effects models
-AF.arma.stud <- brms::brm(lt ~ (1 + scale_d.urb | Name) + scale_d.urb + scale_d.prcp + scale_d.temp + scale_d.et + scale_d.use + arma(gr = Name),
+AF.arma.stud <- brms::brm(lt ~ (1 + scale_d.urb | Name) + scale_d.sw_wr + scale_d.Carryover + scale_d.ubrb_prcp + scale_d.urb + scale_d.prcp + scale_d.temp + scale_d.et + scale_d.use + arma(gr = Name),
                           data = diversions,
                           family = 'student',
                           prior = priors,
@@ -57,7 +60,7 @@ saveRDS(AF.arma.stud, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/
 # Model with no arma ####
 
 # Read in the data for model with no ARMA 
-diversions <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/glmm_input_0531.csv')
+diversions <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/glmm_input_0906.csv')
 print(c('This is the length before removing duplicates', length(diversions$Acre_feet)))
 diversions <- diversions[!duplicated(diversions[c('Name', 'Year')]),] #remove duplicates
 print(length(diversions$Acre_feet))
@@ -67,14 +70,17 @@ priors <- c(
   set_prior('normal(0,1)', class = 'Intercept'),
   set_prior('normal(0,1)', class = 'b', coef = 'scale_class1_urban'),
   set_prior('gamma(1,1)', class = 'sd'),
-  set_prior('normal(0,1)', class = 'b', coef = 'scale_annual_prcp'),
+  set_prior('normal(0,1)', class = 'b', coef = 'scale_irrig_prcp'),
   set_prior('normal(0,1)', class = 'b', coef = 'scale_irrig_temp'),
   set_prior('normal(0,1)', class = 'b', coef = 'scale_et'),
-  set_prior('normal(0,1)', class = 'b', coef = 'scale_AF_used')
+  set_prior('normal(0,1)', class = 'b', coef = 'scale_AF_used'),
+  set_prior('normal(0,1)', class = 'b', coef = 'scale_d.ubrb_prcp'), 
+  set_prior('normal(0,1)', class = 'b', coef = 'scale_d.Carryover'), 
+  set_prior('normal(0,1)', class = 'b', coef = 'scale_d.sw_wr') 
 )
 
 print('Create model without ARMA terms')
-AF.mix <- brm(Acre_feet ~ (1 + scale_class1_urban | Name) + scale_class1_urban + scale_annual_prcp + scale_irrig_temp + scale_et + scale_AF_used,
+AF.mix <- brm(Acre_feet ~ (1 + scale_class1_urban | Name) + scale_d.sw_wr + scale_d.Carryover + scale_d.ubrb_prcp + scale_class1_urban + scale_irrig_prcp + scale_irrig_temp + scale_et + scale_AF_used,
               data = diversions,
               family = 'lognormal',
               prior = priors,
