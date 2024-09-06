@@ -20,7 +20,7 @@ library(mvtnorm) #multivariate distributions
 library(caret) # for train command
 
 # Import the data
-div <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/model_input_0822.csv')
+div <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/model_input_0906.csv')
 div <- div[!duplicated(div[c('Name', 'Year')]),] #remove duplicates
 div <- subset(div, (Acre_feet > 0.00001)) # Remove data that has 0 
 div_new <- subset(div, !(Name == 'Ester Simplot')) #Removes short dataframe
@@ -45,12 +45,11 @@ mlr_run <- function(data, name) {
                           'AF_used',
                           'Carryover',
                           'ubrb_prcp',
-                          'pivot_prop',
                           'sw_wr',
                           'gw_wr')]
   
   #Select variables to scale around mean
-  vars_scale <- c('irrig_prcp', #changed from irrig_prcp
+  vars_scale <- c('irrig_prcp',
                   'irrig_temp')
   
   #Scale variables
@@ -139,9 +138,9 @@ df$sw_wr.p <- NA
 df$gw_wr <- NA
 df$gw_wr.coef <- NA
 df$gw_wr.p <- NA
-df$carryover <- NA
-df$carryover.coef <- NA
-df$carryover.p <- NA
+df$Carryover <- NA
+df$Carryover.coef <- NA
+df$Carryover.p <- NA
 
 
 for (i in 1:60) {
@@ -221,6 +220,6 @@ for (i in 1:60) {
   adjr2 <- output$adjr2
   df[i, 'adjr2'] <- adjr2
 }
-df$vars <- rowSums(df[,c('et', 'temp','prcp','urb','stor','sw_wr','gw_wr', 'ubrb_prcp', 'carryover')])
+df$vars <- rowSums(df[,c('et', 'temp','prcp','urb','stor','sw_wr','gw_wr', 'ubrb_prcp', 'Carryover')])
 
-write.csv(df, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/MLR_final_0822.csv')
+write.csv(df, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/MLR_final_0906.csv')

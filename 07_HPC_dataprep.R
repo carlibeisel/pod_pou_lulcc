@@ -41,7 +41,7 @@ library(dplyr)
 # ------------------------------------------------------------------------------- #
 
 # Without zeros
-data <- data.frame(read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/input_full_0822.csv'))
+data <- data.frame(read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/input_full_0906.csv'))
 data <- data[-c(1,6,37,38)] # drops Python index output with csv
 data <- subset(data, select=-c(Month, DayofYear, Irrigation.Year, Sum, Diversion..cfs.))
 data['Mar_et'][is.na(data['Mar_et'])] <- 0 #fill NA et values with 0
@@ -71,8 +71,7 @@ col_name <- c('ant_prcp',
               'ubrb_prcp',
               'sw_wr',
               'gw_wr',
-              'total_wr',
-              'pivot_prop')
+              'total_wr')
 
 for (i in col_name) {
   name <- colnames(data[i])
@@ -96,12 +95,12 @@ for (i in col_name) {
 tt <- table(data$Name)
 data <- subset(data, Name %in% names(tt[tt>4]))
 
-write.csv(data, '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/input_full_0822.csv', row.names = FALSE)
+write.csv(data, '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/input_full_0906.csv', row.names = FALSE)
 
 
 
 # With zeros data
-data <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/mixed_model_input_0822.csv')
+data <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/mixed_model_input_0906.csv')
 data <- data[!duplicated(data[c('Name', 'Year')]),] #remove duplicates
 
 # The explanatory variables will be substracted by the mean 
@@ -126,8 +125,7 @@ col_name <- c('ant_prcp',
               'ubrb_prcp',
               'sw_wr',
               'gw_wr',
-              'total_wr',
-              'pivot_prop')
+              'total_wr')
 
 for (i in col_name) {
   name <- colnames(data[i])
@@ -155,7 +153,7 @@ data <- subset(data, Name %in% names(tt[tt>4]))
 data$perc_used <- ifelse(data$AF_available > 0, data$AF_used/data$AF_available, NA)
 data$wr_storage <- ifelse(data$AF_available >0, 1, 0)
 
-write.csv(data, '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/mixed_model_input_0822.csv', row.names = FALSE)
+write.csv(data, '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/mixed_model_input_0906.csv', row.names = FALSE)
 
 
 # ARMA MODEL ####
@@ -167,7 +165,7 @@ write.csv(data, '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/m
 # ------------------------------------------------------------------------------- #
 
 # Import the dataset to work with
-div <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/input_full_0822.csv')
+div <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/input_full_0906.csv')
 div$lt <- log(div$Acre_feet)
 
 # Remove data that has 0 
@@ -216,7 +214,7 @@ for (i in names){
 # Check for stationary for both response and predictor variables using Dickey Fuller Test
 
 # Variables include: Annual diversion volume (Acre_feet), evapotranspiration (et), urban
-# proportion (scale_class1_urban), annual precip (scale_annual_prcp), avg max 
+# proportion (scale_class1_urban), annual precip (scale_irrig_prcp), avg max 
 # irrigation season temp (scale_irrig_temp), storage water use (scale_AF_used)
 
 # Stationarity test for panel data
@@ -244,20 +242,20 @@ use.test <- purtest(new_use$AF_used, data = new_use, lags = 'AIC', test = 'levin
 lt.test <- purtest(new$lt, data = new, lags ='AIC', test = 'levinlin')
 AF.test <- purtest(new$Acre_feet, data = new, lags = 'AIC', test = 'levinlin')
 temp.test <- purtest(new$irrig_temp, data = new, lags = 'AIC', test = 'levinlin')
-prcp.test <- purtest(new$annual_prcp, data = new, lags = 'AIC', test = 'levinlin') #non-stationary
+prcp.test <- purtest(new$irrig_prcp, data = new, lags = 'AIC', test = 'levinlin') #non-stationary
 et.test <- purtest(new$et, data = new, lags = 'AIC', test = 'levinlin') # non-stationary
 
 # ET, urban, and storage use will all be differenced. Other variables don't need to be
 
 arma_input <- div_arma %>%
-  select(Name, Year, Acre_feet, irrig_temp, annual_prcp, AF_used, class1_urban, et, lt)
+  select(Name, Year, Acre_feet, irrig_temp, irrig_prcp, AF_used, class1_urban, et, lt)
 
 arma_input = arma_input %>%
   group_by(Name) %>%
   mutate(d.et = c(NA, diff(et)),
          d.urb = c(NA, diff(class1_urban)),
          d.use = c(NA, diff(AF_used)),
-         d.prcp = c(NA, diff(annual_prcp)),
+         d.prcp = c(NA, diff(irrig_prcp)),
          d.temp = c(NA, diff(irrig_temp)),
          d.ubrb_prcp = c(NA, diff(ubrb_prcp)),
          d.pivot_prop = c(NA, diff(pivot_prop)),
@@ -348,13 +346,13 @@ div2 <- subset(div2, Name %in% sel.name)
 glmm_input <- rbind(div,div2)
 
 glmm_input <- glmm_input %>%
-  select(Year, Name, Acre_feet, class1_urban, et, lt, AF_used, annual_prcp, irrig_temp)
+  select(Year, Name, Acre_feet, class1_urban, et, lt, AF_used, irrig_prcp, irrig_temp)
 
 # Scale response variables 
 vars <- c('class1_urban',
           'et',
           'AF_used',
-          'annual_prcp',
+          'irrig_prcp',
           'irrig_temp')
 
 for (i in vars){
