@@ -57,225 +57,229 @@ mae <- function(model, data_compare){
   return(median(abs(resid)))
 }
 
-# MLR figures frequentist ####
+# -------------------------------------------#
 
-mlr <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/MLR_final_0531.csv')
-div <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/input_full_0531.csv')
-div_full <- subset(div, (Acre_feet > 0.00001))
-div_full <- subset(div_full, Name %in% unique(mlr$names))
-df = div_full %>%
-  group_by(Name) %>%
-  summarise(last(class1_urban)-first(class1_urban))
-mlr$urb_change <- mlr$`last(class1_urban) - first(class1_urban)`
+#       MLR Figures                      ####
 
-sub.mlr <- mlr[, c('X', 'prcp.coef', 'temp.coef', 'urb.coef', 'stor.coef', 'et.coef', 'adjr2')]
-sub.mlr$prcp[sub.mlr$prcp.coef > 0] <- 1
-sub.mlr$prcp[sub.mlr$prcp.coef < 0] <- -1
-sub.mlr$urb[sub.mlr$urb.coef > 0] <- 1
-sub.mlr$urb[sub.mlr$urb.coef < 0] <- -1
-sub.mlr$temp[sub.mlr$temp.coef > 0] <- 1
-sub.mlr$temp[sub.mlr$temp.coef < 0] <- -1
-sub.mlr$stor[sub.mlr$stor.coef > 0] <- 1
-sub.mlr$stor[sub.mlr$stor.coef < 0] <- -1
-sub.mlr$et[sub.mlr$et.coef > 0] <- 1
-sub.mlr$et[sub.mlr$et.coef < 0] <- -1
-sub.mlr$r2 <- signif(sub.mlr$adjr2, digits = 3)
-
-heat.data <- sub.mlr[,c('r2','urb','prcp', 'temp', 'et','stor')]
-df.melt <- melt(heat.data, id.vars = 'r2')
-df.melt$adjr2 <- as.character(df.melt$r2)
-cols <- c('#00798c', 'white', '#edae49')
-
-#changed X to 'variable' because X doesn't exist as a column name in df.melt
-df.melt$x <- factor(df.melt$variable,
-                    levels = c('1', '2', '3', '4', '5', '6', '7', '8', '9', '10',
-                               '11', '12', '13', '14', '15', '16', '17', '18', '19', '20',
-                               '21', '22', '23', '24', '25', '26', '27', '28', '29', '30',
-                               '31', '32', '33', '34', '35', '36', '37', '38', '39', '40',
-                               '41', '42', '43', '44', '45', '46', '47', '48', '49', '50',
-                               '51', '52', '53', '54', '55', '56', '57', '58', '59', '60'))
-
-
-hm <- ggplot(data = df.melt, aes(x = variable, y = adjr2, fill = factor(value))) + 
-  geom_tile() + 
-  scale_fill_manual(values = c('#00798c','#edae49'), na.value = 'white') +
-  scale_x_discrete(breaks = unique(df.melt$variable), labels = c('Urban Area', 'Precipitaiton', 'Temperature', 'ET', 'Storage Usee')) + 
-  theme_bw()  +
-  xlab('Variable') +
-  ylab('R^2 of Individual Models')
-hm
-ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/figures/heatmap.png', plot = hm,
-       width = 6, height = 7)
-rows.df <- data.frame(rowSums(mlr[,c('urb','prcp', 'temp','et','stor')]))
-l <- c('urb','prcp', 'temp','et','stor')
-
-df <- data.frame(1:5)
-df$val_up <- NA
-df$val_down <- NA
-df$variable <- NA
-
-
-urbsub <- subset(mlr, stor.p == 1)
-uin <- subset(urbsub, stor.coef > 0)
-udown <- subset(urbsub, stor.coef < 0)
-df$val_up[5] <- length(uin$X)
-df$val_down[5] <- length(udown$X)
-write.csv(df, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/sig.csv')
-df <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/sig.csv')
-df <- df[,c('val_up', 'val_down', 'variable')]
-colnames(df)[colnames(df) == "variable"] ="name"
-
-df <- melt(df, id.vars = 'name' )
-df$x <- factor(df$name,
-               levels = c('urb', 'prcp', 'temp', 'et', 'stor'))
-
-col.df <- data.frame(colSums(mlr[,c('urb.p','prcp.p', 'temp.p','et.p','stor.p')], na.rm = TRUE))
-col.df$Names <- colnames(mlr[,c('urb','prcp', 'temp','et','stor')])
-col.df$vals <- col.df$colSums.mlr...c..urb.p....prcp.p....temp.p....et.p....stor.p.....
-
-tmp <- ggplot_gtable(ggplot_build(hm))
-leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
-legend <- tmp$grobs[[leg]]
-
-hm <- hm +
-  theme(legend.position= 'none')
-hm
-
-col.df$x <- factor(col.df$Names,
-                   levels = c('urb', 'prcp', 'temp', 'et', 'stor'))
-bp.y <- ggplot(col.df, aes(y= vals, x = x)) +
-  geom_bar(stat = 'identity') + 
-  scale_x_discrete(breaks = unique(df.melt$variable), labels = c('Urban Area', 'Precipitaiton', 'Temperature', 'ET', 'Storage Usee')) +
-  ylab('Number of models variable is significant') +
-  theme_bw() +
-  theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(), axis.title.x = element_blank())
-bp.y
-rows.df$rowSums.mlr...c..urb....prcp....temp....et....stor....
-rows.df$X <- mlr$X
-
-cols <- c('#00798c', '#edae49')
-bp.y <- ggplot(df, aes(y= value, x = x, fill = variable)) +
-  geom_bar(stat = 'identity', position = 'stack') + 
-  scale_x_discrete(breaks = unique(df$name), labels = c('Urban Area', 'Precipitaiton', 'Temperature', 'ET', 'Storage Usee')) +
-  scale_fill_manual(values= c('#edae49','#00798c'))+
-  ylab('Number of models variable is significant') +
-  theme_bw() +
-  theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(), axis.title.x = element_blank()) +
-  theme(legend.position = 'none')
-bp.y
-rows.df$x <- factor(rows.df$X,
-                    levels = c('1', '2', '3', '4', '5', '6', '7', '8', '9', '10',
-                               '11', '12', '13', '14', '15', '16', '17', '18', '19', '20',
-                               '21', '22', '23', '24', '25', '26', '27', '28', '29', '30',
-                               '31', '32', '33', '34', '35', '36', '37', '38', '39', '40',
-                               '41', '42', '43', '44', '45', '46', '47', '48', '49', '50',
-                               '51', '52', '53', '54', '55', '56', '57', '58', '59', '60'))
-bp.x <- ggplot(rows.df, aes(y = rowSums.mlr...c..urb....prcp....temp....et....stor...., x = x))+
-  geom_bar(stat = 'identity') +
-  coord_flip() +
-  theme_bw() +
-  xlab('Diversion Number')+
-  ylab('Total variables selected') +
-  theme(axis.title.y = element_blank(), axis.text.y = element_blank(),
-        axis.ticks.y = element_blank())
-
-
-bp.x
-
-
-grid <- ggarrange(bp.y, hm, nrow = 2, ncol = 1, heights = c(30, 60), widths =  15)
-grid
-ggsave(file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/figures/mlr.svg', plot = grid,
-       width = 5, height = 11)
-
-# Figures for MLR Bayesian ####
-
-# Read in the dataframes
-sum.df <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/mlr_brm_sum_final.csv') # coefficients for variables
-fit.df <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/mlr_brm_fit_final.csv') # model fit
-
-# Clean/Manipulate data 
-
-for (x in 1:nrow(sum.df)){
-  sum.df$sig[x] <- ifelse(between(0, sum.df$l.95..CI[x], sum.df$u.95..CI[x]), 'no', 'yes')
-} # Determine if 95% CI overlap 0 
-sum.df$more <- ifelse(sum.df$Estimate > 3 | sum.df$Estimate < -3, 'more', 'no')
-urb <- subset(sum.df, vars == 'scale_class1_urban')
-sum.df <- sum.df %>%
-  mutate(class = case_when(sig == 'no' & more == 'no' ~ 'no',
-                           sig == 'no' & more == 'more' ~ 'oob',
-                           sig == 'yes' & more == 'no' ~ 'sig',
-                           sig == 'yes' & more == 'more' ~ 'sig_oob'))
-
-sum.df <- sum.df %>% 
-  mutate(range_class = case_when(Estimate >= -0.1 & Estimate <= 0.1 ~ '-0.1 to 0.1',
-                                 Estimate > 0.1 & Estimate <= 1 ~ '0.11 to 1',
-                                 Estimate >1 & Estimate <= 10 ~ '1.01 to 10',
-                                 Estimate > 10 & Estimate <=100 ~ '10.01 to 100',
-                                 Estimate > 100 ~ '100.01 to 13,382',
-                                 Estimate < -0.1 & Estimate >= -1 ~ '-1 to - 0.11',
-                                 Estimate < -1 & Estimate >= -10 ~ '-10 to -1.01',
-                                 Estimate < -10 & Estimate > -100 ~ '-57 to -10.01',
-                                 Estimate < -100 & Estimate > -1000 ~ ''))
-
-sum.df <- sum.df[!(sum.df$vars %in% c('shape', 'Intercept')),] # Drop shape and intercept parameter
-sum.df$r2 <- fit.df$Estimate[match(sum.df$Name, fit.df$name)] # Add R2 value to dataframe
-sum.df$r2.char <- as.character(signif(sum.df$r2, digits = 3)) #Converts to character for ggplot and cuts to 3 sigfigs
-
-# Make the heatmap 
-cc <- scales::seq_gradient_pal("#00798C", "white", "Lab")(seq(0,1,length.out=4))
-neg <- c("#00798C", "#6FA4B1", "#B8D1D7", "#FFFFFF")
-pos <- c("#EDAE49", "#F6C278", "#FCD6A4", "#FFEAD1", "#FFFFFF")
-
-hmap <- ggplot(data = sum.df, aes(x = vars, y = r2.char, fill = range_class, pattern = sig,)) +
-  geom_tile() +
-  scale_fill_manual(values = c('-57 to -10.01' = "#00798C", 
-                               '-10 to -1.01' = "#6FA4B1", 
-                               '-1 to - 0.11' = "#B8D1D7", 
-                               '-0.1 to 0.1' = "#FFFFFF", 
-                               '0.11 to 1' = "#FFEAD1" , 
-                               '1.01 to 10' = "#FCD6A4",
-                               '10.01 to 100' = "#F6C278", 
-                               '100.01 to 13,382' = "#EDAE49" )) +
-  theme_bw() +
-  geom_tile_pattern(pattern_color = NA,
-                    pattern_fill = "black",
-                    pattern_density = 0.23,
-                    pattern_spacing = 0.015,
-                    pattern_key_scale_factor = 1) +
-  # scale_pattern_angle_manual(values = c(sig = 45, sig_oob = 45, no = 0, oob = 125)) +
-  scale_pattern_manual(values = c( yes = "stripe", no = 'none')) 
-hmap
-ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_ouput/figures/mlr_bayes_hm.svg', plot = hmap,
-       height = 7,
-       width = 5)
-
-# Pull out number of values with positive effect
-urb.p <- subset(sum.df, vars == 'scale_class1_urban' & Estimate > 0.1)
-urb.n <- subset(sum.df, vars == 'scale_class1_urban' & Estimate < -0.1)
-urb.sig <- subset(sum.df, vars == 'scale_class1_urban' & sig == 'yes' & Estimate > 0)
-precip <- subset(sum.df, vars == 'prcp.m') #weird variable name for precip. in one of bridgets versions it was irrig_precip
-
-max(precip$Estimate)
-min(precip$Estimate)
-
-temp.small <- subset(sum.df, vars == 'irrig_temp' & range_class == '-0.1 to 0.1')
-
-et.p <- subset(sum.df, vars == 'et' & Estimate > 0.1)
-et.n <- subset(sum.df, vars == 'et' & Estimate < -0.1)
-et.sig <- subset(sum.df, vars == 'et' & sig == 'yes')
-
-stor.p <- subset(sum.df, vars == 'KAF_used' & Estimate > 0.1)
-stor.sig <- subset(sum.df, vars == 'KAF_used' & sig == 'yes')
-stor.p.large <- subset(sum.df, vars == 'KAF_used' & Estimate > 10)
-# NOTE: Squish pulls extreme values to the max color for that direction.
-#       There are values more extreme, which drowned out the entire color map. 
-#       Should, and if so, how should I denote that?
-
-box <- ggplot(data = sum.df, aes(x = vars, y = Estimate)) +
-  geom_boxplot()
-
-box
+# -------------------------------------------#
+# 
+# mlr <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/MLR_final_0531.csv')
+# div <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/input_full_0531.csv')
+# div_full <- subset(div, (Acre_feet > 0.00001))
+# div_full <- subset(div_full, Name %in% unique(mlr$names))
+# df = div_full %>%
+#   group_by(Name) %>%
+#   summarise(last(class1_urban)-first(class1_urban))
+# mlr$urb_change <- mlr$`last(class1_urban) - first(class1_urban)`
+# 
+# sub.mlr <- mlr[, c('X', 'prcp.coef', 'temp.coef', 'urb.coef', 'stor.coef', 'et.coef', 'adjr2')]
+# sub.mlr$prcp[sub.mlr$prcp.coef > 0] <- 1
+# sub.mlr$prcp[sub.mlr$prcp.coef < 0] <- -1
+# sub.mlr$urb[sub.mlr$urb.coef > 0] <- 1
+# sub.mlr$urb[sub.mlr$urb.coef < 0] <- -1
+# sub.mlr$temp[sub.mlr$temp.coef > 0] <- 1
+# sub.mlr$temp[sub.mlr$temp.coef < 0] <- -1
+# sub.mlr$stor[sub.mlr$stor.coef > 0] <- 1
+# sub.mlr$stor[sub.mlr$stor.coef < 0] <- -1
+# sub.mlr$et[sub.mlr$et.coef > 0] <- 1
+# sub.mlr$et[sub.mlr$et.coef < 0] <- -1
+# sub.mlr$r2 <- signif(sub.mlr$adjr2, digits = 3)
+# 
+# heat.data <- sub.mlr[,c('r2','urb','prcp', 'temp', 'et','stor')]
+# df.melt <- melt(heat.data, id.vars = 'r2')
+# df.melt$adjr2 <- as.character(df.melt$r2)
+# cols <- c('#00798c', 'white', '#edae49')
+# 
+# #changed X to 'variable' because X doesn't exist as a column name in df.melt
+# df.melt$x <- factor(df.melt$variable,
+#                     levels = c('1', '2', '3', '4', '5', '6', '7', '8', '9', '10',
+#                                '11', '12', '13', '14', '15', '16', '17', '18', '19', '20',
+#                                '21', '22', '23', '24', '25', '26', '27', '28', '29', '30',
+#                                '31', '32', '33', '34', '35', '36', '37', '38', '39', '40',
+#                                '41', '42', '43', '44', '45', '46', '47', '48', '49', '50',
+#                                '51', '52', '53', '54', '55', '56', '57', '58', '59', '60'))
+# 
+# 
+# hm <- ggplot(data = df.melt, aes(x = variable, y = adjr2, fill = factor(value))) + 
+#   geom_tile() + 
+#   scale_fill_manual(values = c('#00798c','#edae49'), na.value = 'white') +
+#   scale_x_discrete(breaks = unique(df.melt$variable), labels = c('Urban Area', 'Precipitaiton', 'Temperature', 'ET', 'Storage Usee')) + 
+#   theme_bw()  +
+#   xlab('Variable') +
+#   ylab('R^2 of Individual Models')
+# hm
+# ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/figures/heatmap.png', plot = hm,
+#        width = 6, height = 7)
+# rows.df <- data.frame(rowSums(mlr[,c('urb','prcp', 'temp','et','stor')]))
+# l <- c('urb','prcp', 'temp','et','stor')
+# 
+# df <- data.frame(1:5)
+# df$val_up <- NA
+# df$val_down <- NA
+# df$variable <- NA
+# 
+# 
+# urbsub <- subset(mlr, stor.p == 1)
+# uin <- subset(urbsub, stor.coef > 0)
+# udown <- subset(urbsub, stor.coef < 0)
+# df$val_up[5] <- length(uin$X)
+# df$val_down[5] <- length(udown$X)
+# write.csv(df, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/sig.csv')
+# df <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/sig.csv')
+# df <- df[,c('val_up', 'val_down', 'variable')]
+# colnames(df)[colnames(df) == "variable"] ="name"
+# 
+# df <- melt(df, id.vars = 'name' )
+# df$x <- factor(df$name,
+#                levels = c('urb', 'prcp', 'temp', 'et', 'stor'))
+# 
+# col.df <- data.frame(colSums(mlr[,c('urb.p','prcp.p', 'temp.p','et.p','stor.p')], na.rm = TRUE))
+# col.df$Names <- colnames(mlr[,c('urb','prcp', 'temp','et','stor')])
+# col.df$vals <- col.df$colSums.mlr...c..urb.p....prcp.p....temp.p....et.p....stor.p.....
+# 
+# tmp <- ggplot_gtable(ggplot_build(hm))
+# leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+# legend <- tmp$grobs[[leg]]
+# 
+# hm <- hm +
+#   theme(legend.position= 'none')
+# hm
+# 
+# col.df$x <- factor(col.df$Names,
+#                    levels = c('urb', 'prcp', 'temp', 'et', 'stor'))
+# bp.y <- ggplot(col.df, aes(y= vals, x = x)) +
+#   geom_bar(stat = 'identity') + 
+#   scale_x_discrete(breaks = unique(df.melt$variable), labels = c('Urban Area', 'Precipitaiton', 'Temperature', 'ET', 'Storage Usee')) +
+#   ylab('Number of models variable is significant') +
+#   theme_bw() +
+#   theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(), axis.title.x = element_blank())
+# bp.y
+# rows.df$rowSums.mlr...c..urb....prcp....temp....et....stor....
+# rows.df$X <- mlr$X
+# 
+# cols <- c('#00798c', '#edae49')
+# bp.y <- ggplot(df, aes(y= value, x = x, fill = variable)) +
+#   geom_bar(stat = 'identity', position = 'stack') + 
+#   scale_x_discrete(breaks = unique(df$name), labels = c('Urban Area', 'Precipitaiton', 'Temperature', 'ET', 'Storage Usee')) +
+#   scale_fill_manual(values= c('#edae49','#00798c'))+
+#   ylab('Number of models variable is significant') +
+#   theme_bw() +
+#   theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(), axis.title.x = element_blank()) +
+#   theme(legend.position = 'none')
+# bp.y
+# rows.df$x <- factor(rows.df$X,
+#                     levels = c('1', '2', '3', '4', '5', '6', '7', '8', '9', '10',
+#                                '11', '12', '13', '14', '15', '16', '17', '18', '19', '20',
+#                                '21', '22', '23', '24', '25', '26', '27', '28', '29', '30',
+#                                '31', '32', '33', '34', '35', '36', '37', '38', '39', '40',
+#                                '41', '42', '43', '44', '45', '46', '47', '48', '49', '50',
+#                                '51', '52', '53', '54', '55', '56', '57', '58', '59', '60'))
+# bp.x <- ggplot(rows.df, aes(y = rowSums.mlr...c..urb....prcp....temp....et....stor...., x = x))+
+#   geom_bar(stat = 'identity') +
+#   coord_flip() +
+#   theme_bw() +
+#   xlab('Diversion Number')+
+#   ylab('Total variables selected') +
+#   theme(axis.title.y = element_blank(), axis.text.y = element_blank(),
+#         axis.ticks.y = element_blank())
+# 
+# 
+# bp.x
+# 
+# 
+# grid <- ggarrange(bp.y, hm, nrow = 2, ncol = 1, heights = c(30, 60), widths =  15)
+# grid
+# ggsave(file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/figures/mlr.svg', plot = grid,
+#        width = 5, height = 11)
+# 
+# # Figures for MLR Bayesian ####
+# 
+# # Read in the dataframes
+# sum.df <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/mlr_brm_sum_final.csv') # coefficients for variables
+# fit.df <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/mlr_brm_fit_final.csv') # model fit
+# 
+# # Clean/Manipulate data 
+# 
+# for (x in 1:nrow(sum.df)){
+#   sum.df$sig[x] <- ifelse(between(0, sum.df$l.95..CI[x], sum.df$u.95..CI[x]), 'no', 'yes')
+# } # Determine if 95% CI overlap 0 
+# sum.df$more <- ifelse(sum.df$Estimate > 3 | sum.df$Estimate < -3, 'more', 'no')
+# urb <- subset(sum.df, vars == 'scale_class1_urban')
+# sum.df <- sum.df %>%
+#   mutate(class = case_when(sig == 'no' & more == 'no' ~ 'no',
+#                            sig == 'no' & more == 'more' ~ 'oob',
+#                            sig == 'yes' & more == 'no' ~ 'sig',
+#                            sig == 'yes' & more == 'more' ~ 'sig_oob'))
+# 
+# sum.df <- sum.df %>% 
+#   mutate(range_class = case_when(Estimate >= -0.1 & Estimate <= 0.1 ~ '-0.1 to 0.1',
+#                                  Estimate > 0.1 & Estimate <= 1 ~ '0.11 to 1',
+#                                  Estimate >1 & Estimate <= 10 ~ '1.01 to 10',
+#                                  Estimate > 10 & Estimate <=100 ~ '10.01 to 100',
+#                                  Estimate > 100 ~ '100.01 to 13,382',
+#                                  Estimate < -0.1 & Estimate >= -1 ~ '-1 to - 0.11',
+#                                  Estimate < -1 & Estimate >= -10 ~ '-10 to -1.01',
+#                                  Estimate < -10 & Estimate > -100 ~ '-57 to -10.01',
+#                                  Estimate < -100 & Estimate > -1000 ~ ''))
+# 
+# sum.df <- sum.df[!(sum.df$vars %in% c('shape', 'Intercept')),] # Drop shape and intercept parameter
+# sum.df$r2 <- fit.df$Estimate[match(sum.df$Name, fit.df$name)] # Add R2 value to dataframe
+# sum.df$r2.char <- as.character(signif(sum.df$r2, digits = 3)) #Converts to character for ggplot and cuts to 3 sigfigs
+# 
+# # Make the heatmap 
+# cc <- scales::seq_gradient_pal("#00798C", "white", "Lab")(seq(0,1,length.out=4))
+# neg <- c("#00798C", "#6FA4B1", "#B8D1D7", "#FFFFFF")
+# pos <- c("#EDAE49", "#F6C278", "#FCD6A4", "#FFEAD1", "#FFFFFF")
+# 
+# hmap <- ggplot(data = sum.df, aes(x = vars, y = r2.char, fill = range_class, pattern = sig,)) +
+#   geom_tile() +
+#   scale_fill_manual(values = c('-57 to -10.01' = "#00798C", 
+#                                '-10 to -1.01' = "#6FA4B1", 
+#                                '-1 to - 0.11' = "#B8D1D7", 
+#                                '-0.1 to 0.1' = "#FFFFFF", 
+#                                '0.11 to 1' = "#FFEAD1" , 
+#                                '1.01 to 10' = "#FCD6A4",
+#                                '10.01 to 100' = "#F6C278", 
+#                                '100.01 to 13,382' = "#EDAE49" )) +
+#   theme_bw() +
+#   geom_tile_pattern(pattern_color = NA,
+#                     pattern_fill = "black",
+#                     pattern_density = 0.23,
+#                     pattern_spacing = 0.015,
+#                     pattern_key_scale_factor = 1) +
+#   # scale_pattern_angle_manual(values = c(sig = 45, sig_oob = 45, no = 0, oob = 125)) +
+#   scale_pattern_manual(values = c( yes = "stripe", no = 'none')) 
+# hmap
+# ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_ouput/figures/mlr_bayes_hm.svg', plot = hmap,
+#        height = 7,
+#        width = 5)
+# 
+# # Pull out number of values with positive effect
+# urb.p <- subset(sum.df, vars == 'scale_class1_urban' & Estimate > 0.1)
+# urb.n <- subset(sum.df, vars == 'scale_class1_urban' & Estimate < -0.1)
+# urb.sig <- subset(sum.df, vars == 'scale_class1_urban' & sig == 'yes' & Estimate > 0)
+# precip <- subset(sum.df, vars == 'prcp.m') #weird variable name for precip. in one of bridgets versions it was irrig_precip
+# 
+# max(precip$Estimate)
+# min(precip$Estimate)
+# 
+# temp.small <- subset(sum.df, vars == 'irrig_temp' & range_class == '-0.1 to 0.1')
+# 
+# et.p <- subset(sum.df, vars == 'et' & Estimate > 0.1)
+# et.n <- subset(sum.df, vars == 'et' & Estimate < -0.1)
+# et.sig <- subset(sum.df, vars == 'et' & sig == 'yes')
+# 
+# stor.p <- subset(sum.df, vars == 'KAF_used' & Estimate > 0.1)
+# stor.sig <- subset(sum.df, vars == 'KAF_used' & sig == 'yes')
+# stor.p.large <- subset(sum.df, vars == 'KAF_used' & Estimate > 10)
+# # NOTE: Squish pulls extreme values to the max color for that direction.
+# #       There are values more extreme, which drowned out the entire color map. 
+# #       Should, and if so, how should I denote that?
+# 
+# box <- ggplot(data = sum.df, aes(x = vars, y = Estimate)) +
+#   geom_boxplot()
+# 
+# box
 
 
 # -------------------------------------------#
@@ -497,9 +501,9 @@ epreddraws <-  add_epred_draws(mod.mix,
                                newdata=new,
                                ndraws=1000,
                                re_formula=NA)
-epreddraws$unscale.temp <- unscale(epreddraws$scale_temp, df.mix$temp)
+epreddraws$unscale.irrig_temp <- unscale(epreddraws$scale_irrig_temp, df.mix$irrig_temp)
 temp <- ggplot(data=epreddraws,
-               aes(x = unscale.temp, y = .epred)) +
+               aes(x = unscale.irrig_temp, y = .epred)) +
   stat_lineribbon(
     .width = c(.5), alpha = 0.35, fill="#00798c", 
     color="black", size=2) + 
@@ -515,8 +519,8 @@ ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/figures/m
        height = 4,
        units = 'in')
 change_temp <- epreddraws %>%
-  select(.epred, unscale.temp) %>%
-  group_by(unscale.temp) %>%
+  select(.epred, unscale.irrig_temp) %>%
+  group_by(unscale.irrig_temp) %>%
   summarise(med = median(.epred),
             avg = mean(.epred)) %>%
   mutate(change = c(NA, NA, NA, NA, NA,NA, NA, NA, NA, NA,
@@ -687,7 +691,7 @@ epreddraws <-  add_epred_draws(mod.mix,
                                newdata=new,
                                ndraws=1000,
                                re_formula=NA)
-epreddraws$unscale.Carryover <- unscale(epreddraws$scale_Carryover, df.mix$Carryoverr)
+epreddraws$unscale.Carryover <- unscale(epreddraws$scale_Carryover, df.mix$Carryover)
 Carryover <- ggplot(data=epreddraws,
                 aes(x = unscale.Carryover, y = .epred)) +
   stat_lineribbon(
@@ -856,6 +860,7 @@ mean(change_et$differ_pred, na.rm = T)
 
 # Temp plot 
 
+# Try a basic plot without stat_lineribbon
 
 temp_epred <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/epred_temp.csv')
 temp <- ggplot(data=temp_epred,
@@ -885,7 +890,6 @@ change_temp <- temp_epred %>%
                        NA, NA, NA, NA, NA, NA, NA, NA,
                        diff(unscale.temp, lag = 16)))
 mean(change_temp$differ_pred, na.rm = T)
-
 
 
 # Storage plot
