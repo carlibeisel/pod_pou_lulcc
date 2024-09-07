@@ -36,7 +36,7 @@ new = df.arma %>%
             scale_d.Carryover = mean(scale_d.Carryover),
             scale_d.ubrb_prcp = mean(scale_d.ubrb_prcp),
             scale_d.sw_wr = mean(scale_d.sw_wr),
-            Year = Year)
+            Year = unique(Year))
 new$Name <- NA
 
 # Expected predicted draws
@@ -64,7 +64,7 @@ new = df.arma %>%
             scale_d.Carryover = mean(scale_d.Carryover),
             scale_d.ubrb_prcp = mean(scale_d.ubrb_prcp),
             scale_d.sw_wr = mean(scale_d.sw_wr),
-            Year = Year)
+            Year = unique(Year))
 new$Name <- NA
 
 epreddraws_temp <-  add_epred_draws(mod.arma, 
@@ -90,7 +90,7 @@ new = df.arma %>%
             scale_d.Carryover = mean(scale_d.Carryover),
             scale_d.ubrb_prcp = mean(scale_d.ubrb_prcp),
             scale_d.sw_wr = mean(scale_d.sw_wr),
-            Year = Year)
+            Year = unique(Year))
 new$Name <- NA
 
 epreddraws_af <-  add_epred_draws(mod.arma, 
@@ -116,7 +116,7 @@ new = df.arma %>%
             scale_d.Carryover = mean(scale_d.Carryover),
             scale_d.ubrb_prcp = mean(scale_d.ubrb_prcp),
             scale_d.sw_wr = mean(scale_d.sw_wr),
-            Year = Year)
+            Year = unique(Year))
 new$Name <- NA
 
 epreddraws_et <-  add_epred_draws(mod.arma, 
@@ -143,7 +143,7 @@ new = df.arma %>%
             scale_d.Carryover = seq_range(scale_d.Carryover, n = 200),
             scale_d.ubrb_prcp = mean(scale_d.ubrb_prcp),
             scale_d.sw_wr = mean(scale_d.sw_wr),
-            Year = Year)
+            Year = unique(Year))
 new$Name <- NA
 
 epreddraws_Carryover <-  add_epred_draws(mod.arma, 
@@ -169,7 +169,7 @@ new = df.arma %>%
             scale_d.Carryover = mean(scale_d.Carryover),
             scale_d.ubrb_prcp = seq_range(scale_d.ubrb_prcp, n = 200),
             scale_d.sw_wr = mean(scale_d.sw_wr),
-            Year = Year)
+            Year = unique(Year))
 new$Name <- NA
 
 epreddraws_ubrb_prcp <-  add_epred_draws(mod.arma, 
@@ -195,7 +195,7 @@ new = df.arma %>%
             scale_d.Carryover = mean(scale_d.Carryover),
             scale_d.ubrb_prcp = mean(scale_d.ubrb_prcp),
             scale_d.sw_wr = seq_range(scale_d.sw_wr, n = 200),
-            Year = Year)
+            Year = unique(Year))
 new$Name <- NA
 
 epreddraws_sw_wr <-  add_epred_draws(mod.arma, 
