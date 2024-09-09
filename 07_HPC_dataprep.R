@@ -42,9 +42,7 @@ library(dplyr)
 
 # Without zeros
 data <- data.frame(read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/input_full_0906.csv'))
-print(colnames(data))
 data <- data[-c(1,6)] # drops Python index output with csv
-#data <- data[-c(1,6,37,38)] # drops Python index output with csv
 data <- subset(data, select=-c(Month, DayofYear, Irrigation.Year, Sum, Diversion..cfs.))
 data['Mar_et'][is.na(data['Mar_et'])] <- 0 #fill NA et values with 0
 data['contagion'][is.na(data['contagion'])] <- 100 # fill NA contagion values with 100
@@ -71,6 +69,7 @@ col_name <- c('ant_prcp',
               'AF_used',
               'AF_remaining',
               'AF_available',
+              'et',
               'ubrb_prcp',
               'sw_wr',
               'gw_wr',
@@ -127,6 +126,7 @@ col_name <- c('ant_prcp',
               'AF_remaining',
               'AF_available',
               'ubrb_prcp',
+              'et',
               'sw_wr',
               'gw_wr',
               'total_wr')

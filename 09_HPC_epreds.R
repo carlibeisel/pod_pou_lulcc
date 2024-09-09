@@ -123,7 +123,7 @@ epreddraws_et <-  add_epred_draws(mod.arma,
                                newdata=new,
                                ndraws=1000,
                                re_formula=NA)
-epreddraws_et$unscale.et <- unscale(epreddraws_et$scale_d.et, df.arma$d.et)
+epreddraws_et$unscale.et <- unscale(epreddraws_et$scale_d.et, df.arma$et)
 print('success drawing predictions')
 out_file <- paste('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/epred_et.csv')
 write.csv(epreddraws_et, file = out_file)
@@ -181,7 +181,7 @@ epreddraws_ubrb_prcp <-  add_epred_draws(mod.arma,
                                          newdata=new,
                                          ndraws=1000,
                                          re_formula=NA)
-epreddraws_ubrb_prcp$unscale.ubrb_prcp <- unscale(epreddraws_ubrb_prcp$scale_d.ubrb_prcp, df.arma$d.ubrb_prcp)
+epreddraws_ubrb_prcp$unscale.ubrb_prcp <- unscale(epreddraws_ubrb_prcp$scale_d.ubrb_prcp, df.arma$ubrb_prcp)
 print('success drawing predictions')
 out_file <- paste('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/epred_ubrb_prcp.csv')
 write.csv(epreddraws_ubrb_prcp, file = out_file)
