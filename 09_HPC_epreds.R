@@ -128,6 +128,11 @@ print('success drawing predictions')
 out_file <- paste('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/epred_et.csv')
 write.csv(epreddraws_et, file = out_file)
 
+data <- data.frame(read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/input_full_0906.csv'))
+
+range(data$et)  # Original ET values
+range(df.arma$d.et)  # Original ET values
+range(df.arma$scale_d.et)  # Scaled ET values
 
 # ----------------------- #
 #   Epreds Carryover      #

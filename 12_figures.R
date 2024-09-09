@@ -733,7 +733,7 @@ ggsave(comb, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/m
 
 # -------------------------------------------#
 
-#       Figures for Model with    ARMA    ####
+#       Figures for Model with ARMA    ####
 
 # -------------------------------------------#
 
@@ -818,7 +818,7 @@ change_prcp <- prcp_epred %>%
                          NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA , NA,
                          NA, NA, NA,
                          diff(avg, lag = 25)),
-         differ_et = c(NA, NA, NA, NA, NA, NA, NA, NA, NA , NA,
+         differ_pred = c(NA, NA, NA, NA, NA, NA, NA, NA, NA , NA,
                        NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA , NA,
                        NA, NA, NA,
                        diff(unscale.prcp, lag = 25)))
@@ -851,16 +851,13 @@ change_et <- et_epred %>%
   mutate(differ_pred = c(NA, NA, NA, NA, NA, NA, NA, NA, NA , NA,
                          NA, NA, 
                          diff(avg, lag = 12)),
-         differ_et = c(NA, NA, NA, NA, NA, NA, NA, NA, NA , NA,
+         differ_pred = c(NA, NA, NA, NA, NA, NA, NA, NA, NA , NA,
                        NA, NA, 
                        diff(et_mm, lag = 12)))
 mean(change_et$differ_pred, na.rm = T)
 
 
-
 # Temp plot 
-
-# Try a basic plot without stat_lineribbon
 
 temp_epred <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/epred_temp.csv')
 temp <- ggplot(data=temp_epred,
@@ -886,7 +883,7 @@ change_temp <- temp_epred %>%
   mutate(differ_pred = c(NA, NA, NA, NA, NA, NA, NA, NA, 
                          NA, NA, NA, NA, NA, NA, NA, NA, 
                          diff(avg, lag = 16)),
-         differ_et = c(NA, NA, NA, NA, NA, NA, NA, NA,
+         differ_pred = c(NA, NA, NA, NA, NA, NA, NA, NA,
                        NA, NA, NA, NA, NA, NA, NA, NA,
                        diff(unscale.temp, lag = 16)))
 mean(change_temp$differ_pred, na.rm = T)
@@ -922,17 +919,94 @@ change_stor <- stor_epred %>%
 mean(change_stor$differ_pred, na.rm = T)
 
 
-
 # UBRB Precip
+
+ubrb_prcp_epred <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/epred_ubrb_prcp.csv')
+
+ubrb_prcp <- ggplot(data=ubrb_prcp_epred,
+               aes(x = unscale.ubrb_prcp, y = exp(.epred))) +
+  stat_lineribbon(
+    .width = c(.5), alpha = 0.35, fill='#edae49', 
+    color="black", size=2) + 
+  ylab("Canal Discharge (Acre-ft/yr)") + xlab("Water Year UBRB Precip (in/yr)") +
+  theme_bw() +
+  theme(text = element_text(size = 13)) +
+  scale_y_continuous(labels = scales::comma)
+ubrb_prcp
+ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/figures/arma-ubrb_prcp.tiff', plot = ubrb_prcp,
+       width = 4,
+       height = 4,
+       units = 'in')
+change_ubrb_prcp <- ubrb_prcp_epred %>%
+  select(unscale.ubrb_prcp, .epred) %>%
+  group_by(unscale.ubrb_prcp) %>%
+  summarize(avg = median(exp(.epred))) %>%
+  mutate(differ_pred = c(NA, NA, NA, NA, NA, NA, NA, NA, 
+                         diff(avg, lag = 8)),
+         differ_et = c(NA, NA, NA, NA, NA, NA, NA, NA,  
+                       diff(unscale.ubrb_prcp, lag = 8)))
+mean(change_ubrb_prcp$differ_pred, na.rm = T)
+
 
 # SW Water Rights
 
+sw_wr_epred <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/epred_sw_wr.csv')
+sw_wr <- ggplot(data=sw_wr_epred,
+                    aes(x = unscale.sw_wr, y = exp(.epred))) +
+  stat_lineribbon(
+    .width = c(.5), alpha = 0.35, fill='#edae49', 
+    color="black", size=2) + 
+  ylab("Canal Discharge (Acre-ft/yr)") + xlab("SW Water Rights") +
+  theme_bw() +
+  theme(text = element_text(size = 13)) +
+  scale_y_continuous(labels = scales::comma)
+sw_wr
+ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/figures/arma-sw_wr.tiff', plot = sw_wr,
+       width = 4,
+       height = 4,
+       units = 'in')
+change_sw_wr <- sw_wr_epred %>%
+  select(unscale.sw_wr, .epred) %>%
+  group_by(unscale.sw_wr) %>%
+  summarize(avg = median(exp(.epred))) %>%
+  mutate(differ_pred = c(NA, NA, NA, NA, NA, NA, NA, NA, 
+                         diff(avg, lag = 8)),
+         differ_et = c(NA, NA, NA, NA, NA, NA, NA, NA,  
+                       diff(unscale.ubrb_prcp, lag = 8)))
+mean(change_sw_wr$differ_pred, na.rm = T)
+
 # Reservoir Carryover 
+Carryover_epred <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/epred_Carryover.csv')
+Carryover_epred$KAF <- Carryover_epred$unscale.use/1000
+Carryover <- ggplot(data=Carryover_epred,
+               aes(x = KAF, y = exp(.epred))) +
+  stat_lineribbon(
+    .width = c(.5), alpha = 0.35, fill='#edae49', 
+    color="black", size=2) + 
+  ylab("Canal Discharge (Acre-ft/yr)") + xlab("Reservoir Carryover (KAF/yr)") +
+  theme_bw() +
+  theme(text = element_text(size = 13)) +
+  scale_y_continuous(labels = scales::comma)
+Carryover
+ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/figures/arma-carryover.tiff', plot = Carryover,
+       width = 4,
+       height = 4,
+       units = 'in')
+
+change_Carryover <- Carryover_epred %>%
+  select(unscale.Carryover, .epred) %>%
+  group_by(unscale.Carryover) %>%
+  summarize(avg = median(exp(.epred))) %>%
+  mutate(differ_pred = c(NA, NA, NA, NA, NA, NA, NA, NA, 
+                         diff(avg, lag = 8)),
+         differ_et = c(NA, NA, NA, NA, NA, NA, NA, NA,  
+                       diff(unscale.use, lag = 8)))
+mean(change_Carryover$differ_pred, na.rm = T)
 
 
 # ALL
 
-final <- ggarrange(temp, et, prcp, stor, nrow = 2, ncol = 2, labels = c('A', 'B', 'C', 'D'))
+final <- ggarrange(temp, et, prcp, stor, urban, sw_wr, Carryover, ubrb_prcp, nrow = 4, ncol = 2, labels = c('A', 'B', 'C', 'D','E','F','G','H'))
 ggsave(final, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/figures/grid-arma.tiff',
        width = 9,
        height = 9)
