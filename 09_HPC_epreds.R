@@ -193,7 +193,7 @@ new = df.arma %>%
             scale_d.use = mean(scale_d.use),
             scale_d.Carryover = mean(scale_d.Carryover),
             scale_d.ubrb_prcp = mean(scale_d.ubrb_prcp),
-           # scale_d.sw_wr = seq_range(scale_d.sw_wr, n = 200),
+            scale_d.sw_wr = seq_range(scale_d.sw_wr, n = 200),
             Year = unique(Year))
 new$Name <- NA
 
