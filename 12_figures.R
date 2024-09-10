@@ -290,7 +290,7 @@ mae <- function(model, data_compare){
 
 #Import data and model 
 df.mix <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/glmm_input_0906.csv')
-mod.mix <- readRDS('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/mod2-glmm.RDS')
+mod.mix <- readRDS('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/mod3-glmm.RDS')
 
 # Posterior predictive check 
 
@@ -315,7 +315,7 @@ mcmc_plot(mod.mix,
                        'b_scale_irrig_temp',
                        'b_scale_ubrb_prcp',
                        'b_scale_class1_urban',
-                       'b_scale_sw_wr',
+                       #'b_scale_sw_wr',
                        'b_scale_AF_used',
                        'b_scale_Carryover'),
           prob = 0.95) +
@@ -326,7 +326,7 @@ mcmc_plot(mod.mix,
                               'Irrig. Temp.',
                               'UBRB Precip',
                               'Urban Percentage',
-                              'SW Water Rights',
+                              #'SW Water Rights',
                               'Reservoir Carryover',
                               'Storage Water Use')) + 
   scale_fill_manual(values = c('Evapotranspiration' = 'grey',
@@ -354,7 +354,7 @@ new = df.mix %>%
             scale_irrig_temp = mean(scale_irrig_temp),
             scale_AF_used = mean(scale_AF_used),
             scale_Carryover = mean(scale_Carryover),
-            scale_sw_wr = mean (scale_sw_wr),
+            #scale_sw_wr = mean (scale_sw_wr),
             scale_ubrb_prcp = mean (scale_ubrb_prcp))
 
 epreddraws <-  add_epred_draws(mod.mix, 
@@ -403,7 +403,7 @@ new = df.mix %>%
             scale_irrig_temp = mean(scale_irrig_temp),
             scale_AF_used = seq_range(scale_AF_used, n = 200),
             scale_Carryover = mean(scale_Carryover),
-            scale_sw_wr = mean (scale_sw_wr),
+            #scale_sw_wr = mean (scale_sw_wr),
             scale_ubrb_prcp = mean (scale_ubrb_prcp))
 
 epreddraws <-  add_epred_draws(mod.mix, 
@@ -445,7 +445,7 @@ new = df.mix %>%
             scale_irrig_temp = mean(scale_irrig_temp),
             scale_AF_used = mean(scale_AF_used),
             scale_Carryover = mean(scale_Carryover),
-            scale_sw_wr = mean (scale_sw_wr),
+            #scale_sw_wr = mean (scale_sw_wr),
             scale_ubrb_prcp = mean (scale_ubrb_prcp))
 
 epreddraws <-  add_epred_draws(mod.mix, 
@@ -494,7 +494,7 @@ new = df.mix %>%
             scale_irrig_temp = seq_range(scale_irrig_temp, n = 200),
             scale_AF_used = mean(scale_AF_used),
             scale_Carryover = mean(scale_Carryover),
-            scale_sw_wr = mean (scale_sw_wr),
+            #scale_sw_wr = mean (scale_sw_wr),
             scale_ubrb_prcp = mean (scale_ubrb_prcp))
 
 epreddraws <-  add_epred_draws(mod.mix, 
@@ -541,7 +541,7 @@ new = df.mix %>%
             scale_irrig_temp = mean(scale_irrig_temp),
             scale_AF_used = mean(scale_AF_used),
             scale_Carryover = mean(scale_Carryover),
-            scale_sw_wr = mean (scale_sw_wr),
+           # scale_sw_wr = mean (scale_sw_wr),
             scale_ubrb_prcp = mean (scale_ubrb_prcp))
 
 epreddraws <-  add_epred_draws(mod.mix, 
@@ -588,7 +588,7 @@ new = df.mix %>%
             scale_irrig_temp = mean(scale_irrig_temp),
             scale_AF_used = mean(scale_AF_used),
             scale_Carryover = mean(scale_Carryover),
-            scale_sw_wr = mean (scale_sw_wr),
+           # scale_sw_wr = mean (scale_sw_wr),
             scale_ubrb_prcp = seq_range (scale_ubrb_prcp, n = 200))
 
 epreddraws <-  add_epred_draws(mod.mix, 
@@ -684,7 +684,7 @@ new = df.mix %>%
             scale_irrig_temp = mean(scale_irrig_temp),
             scale_AF_used = mean(scale_AF_used),
             scale_Carryover = seq_range (scale_Carryover, n = 200),
-            scale_sw_wr = mean (scale_sw_wr),
+            #scale_sw_wr = mean (scale_sw_wr),
             scale_ubrb_prcp = mean (scale_ubrb_prcp))
 
 epreddraws <-  add_epred_draws(mod.mix, 
@@ -723,9 +723,8 @@ change_Carryover <- epreddraws %>%
                     NA, NA, NA, diff(med, lag = 73)))
 
 
-
 # ALL
-comb <- ggarrange(sw_wr, ubrb_prcp, prcp, et, temp, Carryover, stor, urban,  ncol=3, nrow = 4, labels = c('A', 'B', 'C','D','E','F','G','H'))
+comb <- ggarrange( ubrb_prcp, prcp, et, temp, Carryover, stor, urban, ncol=3, nrow = 3, labels = c('A', 'B', 'C','D','E','F','G'))
 ggsave(comb, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/figures/marg-GLMM-all.tiff',
        width = 9,
        height = 9)
@@ -738,7 +737,7 @@ ggsave(comb, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_out
 # -------------------------------------------#
 
 df.arma <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/arma_input_0906.csv')
-mod.arma <- readRDS('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/mod2-arma-stud.RDS')
+mod.arma <- readRDS('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/mod3-arma-stud.RDS')
 bayes_R2(mod.arma)
 mae_lt(mod.arma, df.arma$Acre_feet)
 
@@ -768,7 +767,7 @@ mcmc_plot(mod.arma,
                        'b_scale_d.ubrb_prcp',
                        'b_scale_d.temp',
                        'b_scale_d.urb',
-                       'b_scale_d.sw_wr',
+                      # 'b_scale_d.sw_wr',
                        'b_scale_d.use',
                        'b_scale_d.Carryover'),
           prob = 0.95) +
@@ -779,7 +778,7 @@ mcmc_plot(mod.arma,
                               'UBRB Precip.',
                               'Irrig. Temp.',
                               'Urban Percentage',
-                              'SW Water Rights',
+                            #  'SW Water Rights',
                               'Storage Water Use',
                               'Res. Carryover')) +
   xlab('Relative Effect Size (log)') +
@@ -1007,7 +1006,7 @@ mean(change_Carryover$differ_pred, na.rm = T)
 
 # ALL
 
-final <- ggarrange(temp, et, prcp, ubrb_prcp, stor, Carryover, urban, sw_wr, Carryover, nrow = 4, ncol = 3, labels = c('A', 'B', 'C', 'D','E','F','G','H'))
+final <- ggarrange(temp, et, prcp, ubrb_prcp, stor, Carryover, urban, Carryover, nrow = 3, ncol = 3, labels = c('A', 'B', 'C', 'D','E','F','G'))
 ggsave(final, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/figures/grid-arma.tiff',
        width = 9,
        height = 9)
