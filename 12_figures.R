@@ -725,10 +725,10 @@ change_Carryover <- epreddraws %>%
 
 
 # ALL
-comb <- ggarrange(sw_wr, ubrb_prcp, prcp, et, temp, Carryover, stor, urban,  ncol=2, nrow = 4, labels = c('A', 'B', 'C','D','E','F','G','H'))
-ggsave(comb, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/Figures/marg-GLMM-all.tiff',
-       width = 12,
-       height = 4.5)
+comb <- ggarrange(sw_wr, ubrb_prcp, prcp, et, temp, Carryover, stor, urban,  ncol=3, nrow = 4, labels = c('A', 'B', 'C','D','E','F','G','H'))
+ggsave(comb, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/figures/marg-GLMM-all.tiff',
+       width = 9,
+       height = 9)
 
 
 # -------------------------------------------#
@@ -1007,7 +1007,7 @@ mean(change_Carryover$differ_pred, na.rm = T)
 
 # ALL
 
-final <- ggarrange(temp, et, prcp, ubrb_prcp, stor, Carryover, urban, sw_wr, Carryover, nrow = 4, ncol = 2, labels = c('A', 'B', 'C', 'D','E','F','G','H'))
+final <- ggarrange(temp, et, prcp, ubrb_prcp, stor, Carryover, urban, sw_wr, Carryover, nrow = 4, ncol = 3, labels = c('A', 'B', 'C', 'D','E','F','G','H'))
 ggsave(final, file = '/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/figures/grid-arma.tiff',
        width = 9,
        height = 9)
