@@ -123,5 +123,5 @@ rownames(loo_glmm_comp) <- c("Model 1: AF.arma.stud", "Model 2: AF.arma.stud", "
 print(loo_glmm_comp)
 
 # Compare GLMM+ARMA models using loo
-loo_glmm_arma_comp <- loo_compare(loo_glmm_arma1, loo_glmm_arma2, loo_glmm_arma3)
+loo_glmm_arma_comp <- loo_compare(loo_glmm_arma1, loo_glmm_arma3)
 print(loo_glmm_arma_comp)
