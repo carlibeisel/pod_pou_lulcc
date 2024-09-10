@@ -13,7 +13,7 @@ library(tidyverse)
 
 # Load the data and the model 
 df.arma <- read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/arma_input_0906.csv')
-mod.arma <- readRDS('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/mod2-arma-stud.RDS')
+mod.arma <- readRDS('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/mod3-arma-stud.RDS')
 
 # Unscale function
 unscale <- function(x, orig){
@@ -35,7 +35,7 @@ new = df.arma %>%
             scale_d.use = mean(scale_d.use),
             scale_d.Carryover = mean(scale_d.Carryover),
             scale_d.ubrb_prcp = mean(scale_d.ubrb_prcp),
-            scale_d.sw_wr = mean(scale_d.sw_wr),
+            #scale_d.sw_wr = mean(scale_d.sw_wr),
             Year = unique(Year))
 new$Name <- NA
 
@@ -63,7 +63,7 @@ new = df.arma %>%
             scale_d.use = mean(scale_d.use),
             scale_d.Carryover = mean(scale_d.Carryover),
             scale_d.ubrb_prcp = mean(scale_d.ubrb_prcp),
-            scale_d.sw_wr = mean(scale_d.sw_wr),
+            #scale_d.sw_wr = mean(scale_d.sw_wr),
             Year = unique(Year))
 new$Name <- NA
 
@@ -89,7 +89,7 @@ new = df.arma %>%
             scale_d.use = seq_range(scale_d.use, n = 200),
             scale_d.Carryover = mean(scale_d.Carryover),
             scale_d.ubrb_prcp = mean(scale_d.ubrb_prcp),
-            scale_d.sw_wr = mean(scale_d.sw_wr),
+            #scale_d.sw_wr = mean(scale_d.sw_wr),
             Year = unique(Year))
 new$Name <- NA
 
@@ -115,7 +115,7 @@ new = df.arma %>%
             scale_d.use = mean(scale_d.use),
             scale_d.Carryover = mean(scale_d.Carryover),
             scale_d.ubrb_prcp = mean(scale_d.ubrb_prcp),
-            scale_d.sw_wr = mean(scale_d.sw_wr),
+            #scale_d.sw_wr = mean(scale_d.sw_wr),
             Year = unique(Year))
 new$Name <- NA
 
@@ -127,12 +127,6 @@ epreddraws_et$unscale.et <- unscale(epreddraws_et$scale_d.et, df.arma$et)
 print('success drawing predictions')
 out_file <- paste('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/epred_et.csv')
 write.csv(epreddraws_et, file = out_file)
-
-data <- data.frame(read.csv('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_input/input_full_0906.csv'))
-
-range(data$et)  # Original ET values
-range(df.arma$d.et)  # Original ET values
-range(df.arma$scale_d.et)  # Scaled ET values
 
 # ----------------------- #
 #   Epreds Carryover      #
@@ -147,7 +141,7 @@ new = df.arma %>%
             scale_d.use = mean(scale_d.use),
             scale_d.Carryover = seq_range(scale_d.Carryover, n = 200),
             scale_d.ubrb_prcp = mean(scale_d.ubrb_prcp),
-            scale_d.sw_wr = mean(scale_d.sw_wr),
+           # scale_d.sw_wr = mean(scale_d.sw_wr),
             Year = unique(Year))
 new$Name <- NA
 
@@ -173,7 +167,7 @@ new = df.arma %>%
             scale_d.use = mean(scale_d.use),
             scale_d.Carryover = mean(scale_d.Carryover),
             scale_d.ubrb_prcp = seq_range(scale_d.ubrb_prcp, n = 200),
-            scale_d.sw_wr = mean(scale_d.sw_wr),
+            #scale_d.sw_wr = mean(scale_d.sw_wr),
             Year = unique(Year))
 new$Name <- NA
 
@@ -199,7 +193,7 @@ new = df.arma %>%
             scale_d.use = mean(scale_d.use),
             scale_d.Carryover = mean(scale_d.Carryover),
             scale_d.ubrb_prcp = mean(scale_d.ubrb_prcp),
-            scale_d.sw_wr = seq_range(scale_d.sw_wr, n = 200),
+           # scale_d.sw_wr = seq_range(scale_d.sw_wr, n = 200),
             Year = unique(Year))
 new$Name <- NA
 

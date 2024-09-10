@@ -79,7 +79,7 @@ priors <- c(
   set_prior('normal(0,1)', class = 'b', coef = 'scale_et'),
   set_prior('normal(0,1)', class = 'b', coef = 'scale_AF_used'),
   set_prior('normal(0,1)', class = 'b', coef = 'scale_ubrb_prcp'), 
-  set_prior('normal(0,1)', class = 'b', coef = 'scale_Carryover')) 
+  set_prior('normal(0,1)', class = 'b', coef = 'scale_Carryover') 
   #set_prior('normal(0,1)', class = 'b', coef = 'scale_sw_wr') 
 )
 
