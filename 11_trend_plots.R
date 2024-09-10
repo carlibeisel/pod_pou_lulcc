@@ -290,3 +290,4 @@ ggsave('/Users/dbeisel/Desktop/DATA/Bridget/pod_pou_lulcc/model_output/figures/t
        plot = trends_all,
        width = 8,
        height = 6)
+
